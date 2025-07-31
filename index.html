@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>the walls are listening</title>
+  <title>Draw with music!</title>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
   <style>
     @font-face {
@@ -84,12 +84,13 @@ canvas {
   top: clamp(60px, 12vh, 100px);
   left: clamp(5px, 1vw, 15px);
   z-index: 9;
-  background: #ffffff;
-  padding: clamp(0.3rem, 0.5rem, 0.8rem);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: clamp(0.8rem, 1rem, 1.2rem);
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.3rem, 0.5rem, 0.8rem);
+  gap: clamp(0.8rem, 1rem, 1.2rem);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 #brushCursor {
@@ -118,21 +119,26 @@ canvas {
 }
 
 .btn {
-  padding: clamp(0.5rem, 1rem, 1.2rem);
+  padding: 0;
   font-family: "CLT Apfel Grotezk", sans-serif;
   font-size: clamp(0.7rem, 1rem, 1.1rem);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  min-width: clamp(35px, 6vw, 50px);
-  min-height: clamp(35px, 6vw, 50px);
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  width: clamp(55px, 8vw, 75px);
+  height: clamp(55px, 8vw, 75px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .btn:hover {
   transform: scale(1.1);
   filter: brightness(1.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .pink { background-color: rgb(255, 0, 221); }
@@ -142,19 +148,23 @@ canvas {
 .blue { background-color: rgb(125, 244, 255); }
 .black { 
   background-color: black; 
-  padding: clamp(0.3rem, 0.5rem, 0.8rem);
+  width: clamp(50px, 7vw, 70px);
+  height: clamp(50px, 7vw, 70px);
+  border-radius: 15px;
 }
 
 #overlayControl {
-  padding: clamp(0.3rem, 0.5rem, 0.8rem);
   position: fixed;
   top: clamp(50px, 10vh, 80px);
   right: clamp(5px, 1vw, 15px);
   z-index: 9;
   font-size: clamp(0.7rem, 1rem, 1.1rem);
   border: none;
-  border-radius: 6px;
+  border-radius: 15px;
   color: white;
+  background: rgba(0, 0, 0, 0.9);
+  padding: clamp(0.8rem, 1rem, 1.2rem);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 #index-btn {
@@ -206,29 +216,34 @@ canvas {
   display: none;
 }
 
-/* iPad-specific adjustments */
-@media (min-width: 768px) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+/* iPad Portrait (768px-834px width) */
+@media (min-width: 768px) and (max-width: 834px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
   #controls {
     top: clamp(60px, 8vh, 80px);
     left: clamp(10px, 2vw, 20px);
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px;
-    max-width: 60vw;
+    gap: 16px;
+    padding: 20px;
+    max-width: 55vw;
+    justify-content: flex-start;
   }
 
   #overlayControl {
     top: clamp(60px, 8vh, 80px);
     right: clamp(10px, 2vw, 20px);
-    padding: 12px;
+    padding: 20px;
   }
 
   .btn {
+    width: 70px;
+    height: 70px;
     font-size: 16px;
-    padding: 12px;
-    min-width: 50px;
-    min-height: 50px;
+  }
+
+  .black {
+    width: 65px;
+    height: 65px;
   }
 
   #title {
@@ -250,30 +265,113 @@ canvas {
   }
 }
 
+/* iPad Landscape (1024px+ width, max 1366px) - New optimized styles */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  #title {
+    font-size: 24px;
+    padding: 12px;
+    top: 0;
+    height: auto;
+  }
+
+  #prompt {
+    font-size: 16px;
+    padding: 16px 20px;
+    top: 85%;
+    max-width: 80vw;
+  }
+
+  /* Position controls on the left side with more spacing */
+  #controls {
+    top: 15vh;
+    left: 2vw;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 25px;
+    max-width: 22vw;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    justify-content: flex-start;
+  }
+
+  /* Position overlay control on the right side */
+  #overlayControl {
+    top: 15vh;
+    right: 2vw;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Larger, more touch-friendly buttons */
+  .btn {
+    width: 80px;
+    height: 80px;
+    font-size: 16px;
+  }
+
+  .black {
+    width: 75px;
+    height: 75px;
+  }
+
+  /* Position reset button in bottom right for easy access */
+  #resetBtn {
+    font-size: 16px;
+    padding: 12px 20px;
+    bottom: 4vh;
+    right: 4vw;
+    left: auto;
+    border-radius: 20px;
+  }
+
+  /* Adjust home button for landscape */
+  #index-btn {
+    top: 2vh;
+    left: 2vw;
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  /* Make cursors slightly smaller for landscape */
+  #brushCursor, #scraperCursor {
+    width: 50px;
+  }
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 768px) {
   #controls {
     top: auto;
-    bottom: 15vh;
+    bottom: 18vh;
     left: 5vw;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
     max-width: 50vw;
-    gap: 8px;
+    gap: 12px;
+    padding: 16px;
   }
 
   #overlayControl {
     top: auto;
-    bottom: 15vh;
+    bottom: 18vh;
     right: 5vw;
+    padding: 16px;
   }
 
   .btn {
+    width: 55px;
+    height: 55px;
     font-size: 14px;
-    padding: 8px;
-    min-width: 40px;
-    min-height: 40px;
+  }
+
+  .black {
+    width: 50px;
+    height: 50px;
   }
 
   #title {
@@ -302,24 +400,28 @@ canvas {
 /* Extra small screens */
 @media (max-width: 480px) {
   #controls {
-    bottom: 12vh;
+    bottom: 15vh;
     left: 3vw;
-    padding: 8px;
-    gap: 6px;
-    max-width: 55vw;
+    padding: 12px;
+    gap: 10px;
+    max-width: 58vw;
   }
 
   #overlayControl {
-    bottom: 12vh;
+    bottom: 15vh;
     right: 3vw;
-    padding: 8px;
+    padding: 12px;
   }
 
   .btn {
-    min-width: 36px;
-    min-height: 36px;
-    padding: 6px;
+    width: 50px;
+    height: 50px;
     font-size: 12px;
+  }
+
+  .black {
+    width: 45px;
+    height: 45px;
   }
 
   #title {
@@ -345,8 +447,8 @@ canvas {
   }
 }
 
-/* Large screens */
-@media (min-width: 1200px) {
+/* Large desktop screens */
+@media (min-width: 1367px) {
   #title {
     font-size: clamp(1.5rem, 2.5vw, 3rem);
   }
@@ -356,21 +458,80 @@ canvas {
   }
 
   .btn {
+    width: 85px;
+    height: 85px;
     font-size: clamp(0.9rem, 1.2rem, 1.3rem);
-    padding: clamp(0.8rem, 1.2rem, 1.5rem);
+  }
+
+  .black {
+    width: 80px;
+    height: 80px;
+  }
+
+  #controls {
+    gap: 20px;
+    padding: 30px;
   }
 
   #brushCursor, #scraperCursor {
     width: clamp(80px, 6vw, 150px);
   }
 }
+
+/* Additional landscape phone optimization */
+@media (max-width: 896px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  #title {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  #controls {
+    top: 12vh;
+    left: 2vw;
+    flex-direction: row;
+    gap: 12px;
+    padding: 15px;
+    max-width: 28vw;
+  }
+
+  #overlayControl {
+    top: 12vh;
+    right: 2vw;
+    padding: 15px;
+  }
+
+  .btn {
+    width: 60px;
+    height: 60px;
+    font-size: 14px;
+  }
+
+  .black {
+    width: 55px;
+    height: 55px;
+  }
+
+  #resetBtn {
+    bottom: 3vh;
+    right: 3vw;
+    left: auto;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  #prompt {
+    top: 75%;
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+}
   </style>
 </head>
 <body>
-<a href="../index.html" id="index-btn">Home</a>
+
   <div id="prompt">Paint, Overlay, Scrape.</div>
 
-  <div id="title">the walls are singing!</div>
+  <div id="title">Draw, Hide, and Scratch to reveal!</div>
   
   <div id="controls">
     <button class="btn pink" data-color="rgb(255, 0, 221)"></button>
@@ -382,7 +543,7 @@ canvas {
   </div>
 
   <div id="overlayControl">
-    <button class="btn black" id="overlayBtn">Overlay</button>
+    <button class="btn black" id="overlayBtn">Hide</button>
   </div>
   <button class="btn" id="resetBtn">Reset</button>
   <canvas id="colorCanvas"></canvas>
@@ -539,6 +700,8 @@ canvas {
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x, y);
+        const colorName = getColorAtPixel(x, y);
+        if (colorName) playNote(colorName);
       } else {
         octx.save();
         octx.globalCompositeOperation = 'destination-out';
