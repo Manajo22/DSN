@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>the walls are listening</title>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
+  <style>
+    @font-face {
+  font-family: "CLT Apfel Grotezk";
+  src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  font-family: "CLT Apfel Grotezk", sans-serif;
+  background: url('white-wall.jpg') no-repeat center center fixed;
+  background-size: cover;
+  touch-action: none;
+}
+
+#title {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  background: white;
+  font-size: clamp(1rem, 2vw, 2.5rem);
+  font-weight: bold;
+  padding: clamp(0.5rem, 0.9rem, 1.2rem);
+  z-index: 10;
+  animation: floatTitle 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+@keyframes floatTitle {
+  0%, 100% {
+    transform: translateY(7px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+#prompt {
+  position: fixed;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.95);
+  padding: clamp(0.8rem, 1rem, 1.5rem) clamp(1.2rem, 2rem, 2.5rem);
+  border-radius: 20px;
+  font-size: clamp(0.8rem, 1vw, 1.2rem);
+  font-weight: bold;
+  z-index: 20;
+  animation: fadeOut 2s 2s forwards;
+  text-align: center;
+  max-width: 90vw;
+  box-sizing: border-box;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+}
+
+#controls {
+  position: fixed;
+  top: clamp(60px, 12vh, 100px);
+  left: clamp(5px, 1vw, 15px);
+  z-index: 9;
+  background: #ffffff;
+  padding: clamp(0.3rem, 0.5rem, 0.8rem);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.3rem, 0.5rem, 0.8rem);
+}
+
+#brushCursor {
+  position: fixed;
+  width: clamp(40px, 8vw, 120px);
+  height: auto;
+  pointer-events: none;
+  z-index: 11;
+  transition: top 0.01s linear, left 0.01s linear;
+}
+
+#scraperCursor {
+  position: fixed;
+  width: clamp(40px, 8vw, 120px);
+  height: auto;
+  pointer-events: none;
+  z-index: 11;
+  transition: top 0.01s linear, left 0.01s linear;
+}
+
+/* Hide cursors on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  #brushCursor, #scraperCursor {
+    display: none !important;
+  }
+}
+
+.btn {
+  padding: clamp(0.5rem, 1rem, 1.2rem);
+  font-family: "CLT Apfel Grotezk", sans-serif;
+  font-size: clamp(0.7rem, 1rem, 1.1rem);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  min-width: clamp(35px, 6vw, 50px);
+  min-height: clamp(35px, 6vw, 50px);
+}
+
+.btn:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+.pink { background-color: rgb(255, 0, 221); }
+.purple { background-color: rgb(92, 0, 157); }
+.yellow { background-color: rgb(255, 187, 0); }
+.orange { background-color: rgb(255, 77, 0); }
+.blue { background-color: rgb(125, 244, 255); }
+.black { 
+  background-color: black; 
+  padding: clamp(0.3rem, 0.5rem, 0.8rem);
+}
+
+#overlayControl {
+  padding: clamp(0.3rem, 0.5rem, 0.8rem);
+  position: fixed;
+  top: clamp(50px, 10vh, 80px);
+  right: clamp(5px, 1vw, 15px);
+  z-index: 9;
+  font-size: clamp(0.7rem, 1rem, 1.1rem);
+  border: none;
+  border-radius: 6px;
+  color: white;
+}
+
+#index-btn {
+  position: absolute;
+  top: clamp(0.5rem, 1rem, 1.5rem);
+  left: clamp(0.5rem, 1rem, 1.5rem);
+  padding: clamp(0.3rem, 0.5rem, 0.8rem) clamp(0.5rem, 1rem, 1.2rem);
+  background-color: #000000;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-family: "CLT Apfel Grotezk";
+  z-index: 1002;
+  font-size: clamp(0.7rem, 1rem, 1.1rem);
+  box-shadow: 2px 2px 2px #ff179e;
+  transition: background-color 0.2s ease;
+}
+
+#index-btn:hover {
+  background: linear-gradient(90deg,#ff179e, #9855fe, #45a0fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border-color: #ff179e;
+}
+
+#resetBtn {
+  position: fixed;
+  bottom: clamp(10px, 3vh, 25px);
+  left: clamp(10px, 3vw, 25px);
+  background: linear-gradient(90deg, #ff179e, #9855fe, #45a0fc);
+  color: rgb(0, 0, 0);
+  z-index: 10;
+  display: none;
+  padding: clamp(0.4rem, 0.6rem, 0.8rem) clamp(0.6rem, 1rem, 1.2rem);
+  font-weight: bold;
+  border: none;
+  border-radius: 15px;
+  font-size: clamp(0.7rem, 1rem, 1.1rem);
+}
+
+#resetBtn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #c1ff3c, #55fef8,#45a0fc);
+  color: rgb(255, 255, 255);
+}
+
+.hidden {
+  display: none;
+}
+
+/* iPad-specific adjustments */
+@media (min-width: 768px) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+  #controls {
+    top: clamp(60px, 8vh, 80px);
+    left: clamp(10px, 2vw, 20px);
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    max-width: 60vw;
+  }
+
+  #overlayControl {
+    top: clamp(60px, 8vh, 80px);
+    right: clamp(10px, 2vw, 20px);
+    padding: 12px;
+  }
+
+  .btn {
+    font-size: 16px;
+    padding: 12px;
+    min-width: 50px;
+    min-height: 50px;
+  }
+
+  #title {
+    font-size: 28px;
+    padding: 16px;
+  }
+
+  #prompt {
+    font-size: 18px;
+    padding: 20px 24px;
+    top: 85%;
+  }
+
+  #resetBtn {
+    font-size: 18px;
+    padding: 14px 18px;
+    bottom: 5vh;
+    left: 5vw;
+  }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  #controls {
+    top: auto;
+    bottom: 15vh;
+    left: 5vw;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    max-width: 50vw;
+    gap: 8px;
+  }
+
+  #overlayControl {
+    top: auto;
+    bottom: 15vh;
+    right: 5vw;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 8px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  #title {
+    font-size: 24px;
+    padding: 12px;
+  }
+
+  #prompt {
+    font-size: 16px;
+    padding: 16px 20px;
+    top: 85%;
+  }
+
+  #resetBtn {
+    font-size: 16px;
+    padding: 12px 16px;
+    bottom: 5vh;
+    left: 5vw;
+  }
+
+  #brushCursor, #scraperCursor {
+    width: 60px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  #controls {
+    bottom: 12vh;
+    left: 3vw;
+    padding: 8px;
+    gap: 6px;
+    max-width: 55vw;
+  }
+
+  #overlayControl {
+    bottom: 12vh;
+    right: 3vw;
+    padding: 8px;
+  }
+
+  .btn {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  #title {
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  #prompt {
+    font-size: 14px;
+    top: 80%;
+    padding: 12px 16px;
+  }
+
+  #brushCursor, #scraperCursor {
+    width: 50px;
+  }
+
+  #resetBtn {
+    bottom: 3vh;
+    left: 3vw;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  #title {
+    font-size: clamp(1.5rem, 2.5vw, 3rem);
+  }
+
+  #prompt {
+    font-size: clamp(1rem, 1.2vw, 1.5rem);
+  }
+
+  .btn {
+    font-size: clamp(0.9rem, 1.2rem, 1.3rem);
+    padding: clamp(0.8rem, 1.2rem, 1.5rem);
+  }
+
+  #brushCursor, #scraperCursor {
+    width: clamp(80px, 6vw, 150px);
+  }
+}
+  </style>
+</head>
+<body>
+<a href="../index.html" id="index-btn">Home</a>
+  <div id="prompt">Paint, Overlay, Scrape.</div>
+
+  <div id="title">the walls are singing!</div>
+  
+  <div id="controls">
+    <button class="btn pink" onclick="setColor('rgb(255, 0, 221)')"></button>
+    <button class="btn purple" onclick="setColor('rgb(92, 0, 157)')"></button>
+    <button class="btn yellow" onclick="setColor('rgb(255, 187, 0)')"></button>
+    <button class="btn orange" onclick="setColor('rgb(255, 77, 0)')"></button>
+    <button class="btn blue" onclick="setColor('rgb(125, 244, 255)')"></button>
+   
+  </div>
+
+  <div id="overlayControl">
+    <button class="btn black" onclick="addOverlay()">Overlay</button>
+  </div>
+  <button class="btn" id="resetBtn" onclick="resetCanvas()">Reset</button>
+  <canvas id="colorCanvas"></canvas>
+  
+  <canvas id="overlayCanvas" class="hidden"></canvas>
+  <img src="brush.png" id="brushCursor" style="display: block;" />
+  <img src="scraper.png" id="scraperCursor" style="display: none;" />
+
+
+  <script>
+    const colorCanvas = document.getElementById('colorCanvas');
+    const overlayCanvas = document.getElementById('overlayCanvas');
+    const ctx = colorCanvas.getContext('2d');
+    const octx = overlayCanvas.getContext('2d');
+    const backgroundImage = new Image();
+    let audioInitialized = false;
+    let isTouchDevice = false;
+
+    // Detect touch device
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      isTouchDevice = true;
+    }
+
+    backgroundImage.src = 'white-wall.jpg'; // adjust path if needed
+
+    backgroundImage.onload = function() {
+      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+    };
+
+    function resizeCanvasDimensions() {
+      colorCanvas.width = overlayCanvas.width = window.innerWidth;
+      colorCanvas.height = overlayCanvas.height = window.innerHeight;
+      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+    }
+
+    resizeCanvasDimensions();
+    window.addEventListener('resize', resizeCanvasDimensions);
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
+
+    let painting = false;
+    let currentColor = 'rgb(255, 0, 221)';
+    let isScratching = false;
+
+    const synth = new Tone.AMSynth().toDestination();
+
+    const colorNotes = {
+      pink: "C4",
+      purple: "D4",
+      yellow: "E4",
+      orange: "F4",
+      blue: "G4"
+    };
+
+    // Initialize audio context on first user interaction (important for iOS/iPad)
+    async function initAudio() {
+      if (!audioInitialized) {
+        try {
+          await Tone.start();
+          audioInitialized = true;
+        } catch (error) {
+          console.log('Audio initialization failed:', error);
+        }
+      }
+    }
+
+    function setColor(color) {
+      initAudio(); // Initialize audio on user interaction
+      currentColor = color;
+    }
+
+    function addOverlay() {
+      initAudio(); // Initialize audio on user interaction
+      overlayCanvas.classList.remove('hidden');
+      document.getElementById('controls').style.display = 'none';
+      document.getElementById('overlayControl').style.display = 'none';
+      document.getElementById('resetBtn').style.display = 'inline-block';
+      octx.fillStyle = 'black';
+      octx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      isScratching = true;
+      
+      if (!isTouchDevice) {
+        document.getElementById('brushCursor').style.display = "none";
+        document.getElementById('scraperCursor').style.display = "block";
+      }
+    }
+
+    function resetCanvas() {
+      ctx.clearRect(0, 0, colorCanvas.width, colorCanvas.height);
+      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      overlayCanvas.classList.add('hidden');
+      document.getElementById('controls').style.display = 'block';
+      document.getElementById('overlayControl').style.display = 'block';
+      document.getElementById('resetBtn').style.display = 'none';
+      isScratching = false;
+
+      if (!isTouchDevice) {
+        document.getElementById('scraperCursor').style.display = "none";
+        document.getElementById('brushCursor').style.display = "block";
+      }
+    }
+
+    function getColorAtPixel(x, y) {
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const r = pixel[0], g = pixel[1], b = pixel[2];
+      if (r === 255 && g === 0 && b === 221) return 'pink';
+      if (r === 92 && g === 0 && b === 157) return 'purple';
+      if (r === 255 && g === 187 && b === 0) return 'yellow';
+      if (r === 255 && g === 77 && b === 0) return 'orange';
+      if (r === 125 && g === 244 && b === 255) return 'blue';
+      return null;
+    }
+
+    async function playNote(colorName) {
+      const note = colorNotes[colorName];
+      if (note && audioInitialized) {
+        try {
+          synth.triggerAttackRelease(note, "8n");
+        } catch (error) {
+          console.log('Audio playback error:', error);
+        }
+      }
+    }
+
+    function draw(x, y) {
+      if (!painting) return;
+
+      if (!isScratching) {
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 30;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      } else {
+        octx.save();
+        octx.globalCompositeOperation = 'destination-out';
+        octx.beginPath();
+        octx.arc(x, y, 25, 0, Math.PI * 2, false);
+        octx.fill();
+        octx.restore();
+
+        const colorName = getColorAtPixel(x, y);
+        if (colorName) playNote(colorName);
+      }
+    }
+
+    function startDraw(e) {
+      initAudio(); // Initialize audio on first interaction
+      painting = true;
+      const rect = colorCanvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+      const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      draw(x, y);
+    }
+
+    function endDraw() {
+      painting = false;
+      ctx.beginPath();
+    }
+
+    function moveDraw(e) {
+      if (!painting) return;
+      const rect = colorCanvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+      const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+      draw(x, y);
+    }
+
+    // Mouse events (desktop only)
+    if (!isTouchDevice) {
+      window.addEventListener('mousedown', startDraw);
+      window.addEventListener('mouseup', endDraw);
+      window.addEventListener('mousemove', moveDraw);
+    }
+
+    // Touch events
+    window.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startDraw(e);
+    }, { passive: false });
+    
+    window.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      endDraw();
+    }, { passive: false });
+    
+    window.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      moveDraw(e);
+    }, { passive: false });
+
+    const brushCursor = document.getElementById("brushCursor");
+    const scraperCursor = document.getElementById("scraperCursor");
+
+    // Mouse cursor tracking (desktop only)
+    if (!isTouchDevice) {
+      window.addEventListener("mousemove", (e) => {
+        const rect = colorCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        if (isScratching) {
+          brushCursor.style.display = "none";
+          scraperCursor.style.display = "block";
+          scraperCursor.style.left = `${e.clientX - 30}px`;
+          scraperCursor.style.top = `${e.clientY - 30}px`;
+        } else {
+          scraperCursor.style.display = "none";
+          brushCursor.style.display = "block";
+          brushCursor.style.left = `${e.clientX - 30}px`;
+          brushCursor.style.top = `${e.clientY - 30}px`;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
