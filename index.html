@@ -373,18 +373,18 @@ canvas {
   <div id="title">the walls are singing!</div>
   
   <div id="controls">
-    <button class="btn pink" onclick="setColor('rgb(255, 0, 221)')"></button>
-    <button class="btn purple" onclick="setColor('rgb(92, 0, 157)')"></button>
-    <button class="btn yellow" onclick="setColor('rgb(255, 187, 0)')"></button>
-    <button class="btn orange" onclick="setColor('rgb(255, 77, 0)')"></button>
-    <button class="btn blue" onclick="setColor('rgb(125, 244, 255)')"></button>
+    <button class="btn pink" data-color="rgb(255, 0, 221)"></button>
+    <button class="btn purple" data-color="rgb(92, 0, 157)"></button>
+    <button class="btn yellow" data-color="rgb(255, 187, 0)"></button>
+    <button class="btn orange" data-color="rgb(255, 77, 0)"></button>
+    <button class="btn blue" data-color="rgb(125, 244, 255)"></button>
    
   </div>
 
   <div id="overlayControl">
-    <button class="btn black" onclick="addOverlay()">Overlay</button>
+    <button class="btn black" id="overlayBtn">Overlay</button>
   </div>
-  <button class="btn" id="resetBtn" onclick="resetCanvas()">Reset</button>
+  <button class="btn" id="resetBtn">Reset</button>
   <canvas id="colorCanvas"></canvas>
   
   <canvas id="overlayCanvas" class="hidden"></canvas>
@@ -406,7 +406,17 @@ canvas {
       isTouchDevice = true;
     }
 
-    backgroundImage.src = 'white-wall.jpg'; // adjust path if needed
+    // Create a fallback white background
+    function createWhiteBackground() {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
+    }
+
+    backgroundImage.src = 'white-wall.jpg';
+    backgroundImage.onerror = function() {
+      // If image fails to load, use white background
+      createWhiteBackground();
+    };
 
     backgroundImage.onload = function() {
       ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
@@ -415,20 +425,22 @@ canvas {
     function resizeCanvasDimensions() {
       colorCanvas.width = overlayCanvas.width = window.innerWidth;
       colorCanvas.height = overlayCanvas.height = window.innerHeight;
-      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      
+      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      } else {
+        createWhiteBackground();
+      }
     }
 
     resizeCanvasDimensions();
     window.addEventListener('resize', resizeCanvasDimensions);
 
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
-
     let painting = false;
     let currentColor = 'rgb(255, 0, 221)';
     let isScratching = false;
 
-    const synth = new Tone.AMSynth().toDestination();
+    let synth;
 
     const colorNotes = {
       pink: "C4",
@@ -438,12 +450,14 @@ canvas {
       blue: "G4"
     };
 
-    // Initialize audio context on first user interaction (important for iOS/iPad)
+    // Initialize audio context on first user interaction
     async function initAudio() {
       if (!audioInitialized) {
         try {
           await Tone.start();
+          synth = new Tone.AMSynth().toDestination();
           audioInitialized = true;
+          console.log('Audio initialized successfully');
         } catch (error) {
           console.log('Audio initialization failed:', error);
         }
@@ -451,12 +465,13 @@ canvas {
     }
 
     function setColor(color) {
-      initAudio(); // Initialize audio on user interaction
+      initAudio();
       currentColor = color;
+      console.log('Color set to:', color);
     }
 
     function addOverlay() {
-      initAudio(); // Initialize audio on user interaction
+      initAudio();
       overlayCanvas.classList.remove('hidden');
       document.getElementById('controls').style.display = 'none';
       document.getElementById('overlayControl').style.display = 'none';
@@ -473,10 +488,14 @@ canvas {
 
     function resetCanvas() {
       ctx.clearRect(0, 0, colorCanvas.width, colorCanvas.height);
-      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      } else {
+        createWhiteBackground();
+      }
       octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
       overlayCanvas.classList.add('hidden');
-      document.getElementById('controls').style.display = 'block';
+      document.getElementById('controls').style.display = 'flex';
       document.getElementById('overlayControl').style.display = 'block';
       document.getElementById('resetBtn').style.display = 'none';
       isScratching = false;
@@ -500,7 +519,7 @@ canvas {
 
     async function playNote(colorName) {
       const note = colorNotes[colorName];
-      if (note && audioInitialized) {
+      if (note && audioInitialized && synth) {
         try {
           synth.triggerAttackRelease(note, "8n");
         } catch (error) {
@@ -533,63 +552,112 @@ canvas {
       }
     }
 
-    function startDraw(e) {
-      initAudio(); // Initialize audio on first interaction
-      painting = true;
+    function getEventCoords(e) {
       const rect = colorCanvas.getBoundingClientRect();
-      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-      const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      draw(x, y);
+      let x, y;
+      
+      if (e.touches && e.touches.length > 0) {
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+      }
+      
+      // Scale coordinates to match canvas resolution
+      x = x * (colorCanvas.width / rect.width);
+      y = y * (colorCanvas.height / rect.height);
+      
+      return { x, y };
     }
 
-    function endDraw() {
+    function startDraw(e) {
+      e.preventDefault();
+      initAudio();
+      painting = true;
+      const coords = getEventCoords(e);
+      ctx.beginPath();
+      ctx.moveTo(coords.x, coords.y);
+      draw(coords.x, coords.y);
+    }
+
+    function endDraw(e) {
+      e.preventDefault();
       painting = false;
       ctx.beginPath();
     }
 
     function moveDraw(e) {
+      e.preventDefault();
       if (!painting) return;
-      const rect = colorCanvas.getBoundingClientRect();
-      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-      const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
-      draw(x, y);
+      const coords = getEventCoords(e);
+      draw(coords.x, coords.y);
     }
 
-    // Mouse events (desktop only)
-    if (!isTouchDevice) {
-      window.addEventListener('mousedown', startDraw);
-      window.addEventListener('mouseup', endDraw);
-      window.addEventListener('mousemove', moveDraw);
-    }
+    // Add event listeners for color buttons
+    document.querySelectorAll('.btn[data-color]').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const color = this.getAttribute('data-color');
+        setColor(color);
+      });
+      
+      // Also add touch events for better iOS support
+      button.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        const color = this.getAttribute('data-color');
+        setColor(color);
+      });
+    });
 
-    // Touch events
-    window.addEventListener('touchstart', (e) => {
+    // Add event listeners for overlay and reset buttons
+    document.getElementById('overlayBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      startDraw(e);
-    }, { passive: false });
-    
-    window.addEventListener('touchend', (e) => {
+      addOverlay();
+    });
+
+    document.getElementById('overlayBtn').addEventListener('touchend', function(e) {
       e.preventDefault();
-      endDraw();
-    }, { passive: false });
-    
-    window.addEventListener('touchmove', (e) => {
+      addOverlay();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      moveDraw(e);
-    }, { passive: false });
+      resetCanvas();
+    });
+
+    document.getElementById('resetBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      resetCanvas();
+    });
+
+    // Canvas drawing events
+    if (isTouchDevice) {
+      // Touch events for mobile/tablet
+      colorCanvas.addEventListener('touchstart', startDraw, { passive: false });
+      colorCanvas.addEventListener('touchend', endDraw, { passive: false });
+      colorCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+      
+      overlayCanvas.addEventListener('touchstart', startDraw, { passive: false });
+      overlayCanvas.addEventListener('touchend', endDraw, { passive: false });
+      overlayCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+    } else {
+      // Mouse events for desktop
+      colorCanvas.addEventListener('mousedown', startDraw);
+      colorCanvas.addEventListener('mouseup', endDraw);
+      colorCanvas.addEventListener('mousemove', moveDraw);
+      
+      overlayCanvas.addEventListener('mousedown', startDraw);
+      overlayCanvas.addEventListener('mouseup', endDraw);
+      overlayCanvas.addEventListener('mousemove', moveDraw);
+    }
 
     const brushCursor = document.getElementById("brushCursor");
     const scraperCursor = document.getElementById("scraperCursor");
 
     // Mouse cursor tracking (desktop only)
     if (!isTouchDevice) {
-      window.addEventListener("mousemove", (e) => {
-        const rect = colorCanvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
+      document.addEventListener("mousemove", (e) => {
         if (isScratching) {
           brushCursor.style.display = "none";
           scraperCursor.style.display = "block";
@@ -603,6 +671,10 @@ canvas {
         }
       });
     }
+
+    // Ensure audio context is started on any user interaction
+    document.addEventListener('touchstart', initAudio, { once: true });
+    document.addEventListener('click', initAudio, { once: true });
   </script>
 </body>
 </html>
