@@ -146,6 +146,114 @@ canvas {
 .yellow { background-color: rgb(255, 187, 0); }
 .orange { background-color: rgb(255, 77, 0); }
 .blue { background-color: rgb(125, 244, 255); }
+
+.gradient { 
+  background: radial-gradient(circle, 
+    rgb(255, 0, 221) 0%, 
+    rgb(92, 0, 157) 20%, 
+    rgb(255, 187, 0) 40%, 
+    rgb(255, 77, 0) 60%, 
+    rgb(125, 244, 255) 80%,
+    rgb(255, 0, 221) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, 
+    rgb(255, 0, 221) 0%, 
+    rgb(92, 0, 157) 20%, 
+    rgb(255, 187, 0) 40%, 
+    rgb(255, 77, 0) 60%, 
+    rgb(125, 244, 255) 80%,
+    rgb(255, 0, 221) 100%);
+  animation: gradientShift 3s ease-in-out infinite;
+  border-radius: 50%;
+}
+
+@keyframes gradientShift {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+}
+
+.eraser { 
+  background-color: #f0f0f0; 
+  color: #333;
+  border: 3px solid #999;
+  font-weight: bold;
+}
+
+#brushSizeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 192, 203, 0.2);
+  border-radius: 15px;
+  border: 2px solid rgb(255, 0, 221);
+}
+
+#brushSizeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, rgb(255, 0, 221), rgb(255, 100, 200));
+  outline: none;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+#brushSizeSlider:hover {
+  opacity: 1;
+}
+
+#brushSizeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(255, 0, 221);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+#brushSizeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+#brushSizeSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(255, 0, 221);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+#brushSizeSlider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}
+
+#brushSizeLabel {
+  font-size: clamp(0.6rem, 0.8rem, 1rem);
+  font-weight: bold;
+  color: rgb(255, 0, 221);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
 .black { 
   background-color: black; 
   width: clamp(50px, 7vw, 70px);
@@ -212,6 +320,27 @@ canvas {
   color: rgb(255, 255, 255);
 }
 
+#mainResetBtn {
+  position: fixed;
+  bottom: clamp(10px, 3vh, 25px);
+  right: clamp(10px, 3vw, 25px);
+  background: linear-gradient(90deg, #ff179e, #9855fe, #45a0fc);
+  color: rgb(0, 0, 0);
+  z-index: 10;
+  padding: clamp(0.4rem, 0.6rem, 0.8rem) clamp(0.6rem, 1rem, 1.2rem);
+  font-weight: bold;
+  border: none;
+  border-radius: 15px;
+  font-size: clamp(0.7rem, 1rem, 1.1rem);
+  cursor: pointer;
+}
+
+#mainResetBtn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #c1ff3c, #55fef8,#45a0fc);
+  color: rgb(255, 255, 255);
+}
+
 .hidden {
   display: none;
 }
@@ -257,11 +386,18 @@ canvas {
     top: 85%;
   }
 
-  #resetBtn {
+  #resetBtn, #mainResetBtn {
     font-size: 18px;
     padding: 14px 18px;
     bottom: 5vh;
+  }
+
+  #resetBtn {
     left: 5vw;
+  }
+
+  #mainResetBtn {
+    right: 5vw;
   }
 }
 
@@ -318,14 +454,20 @@ canvas {
     height: 75px;
   }
 
-  /* Position reset button in bottom right for easy access */
-  #resetBtn {
+  /* Position reset buttons */
+  #resetBtn, #mainResetBtn {
     font-size: 16px;
     padding: 12px 20px;
     bottom: 4vh;
-    right: 4vw;
-    left: auto;
     border-radius: 20px;
+  }
+
+  #resetBtn {
+    left: 4vw;
+  }
+
+  #mainResetBtn {
+    right: 4vw;
   }
 
   /* Adjust home button for landscape */
@@ -354,6 +496,16 @@ canvas {
     max-width: 50vw;
     gap: 12px;
     padding: 16px;
+  }
+
+  #brushSizeContainer {
+    order: -1; /* Put slider first on mobile */
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  #brushSizeSlider {
+    width: 120px;
   }
 
   #overlayControl {
@@ -385,11 +537,18 @@ canvas {
     top: 85%;
   }
 
-  #resetBtn {
+  #resetBtn, #mainResetBtn {
     font-size: 16px;
     padding: 12px 16px;
     bottom: 5vh;
+  }
+
+  #resetBtn {
     left: 5vw;
+  }
+
+  #mainResetBtn {
+    right: 5vw;
   }
 
   #brushCursor, #scraperCursor {
@@ -439,11 +598,18 @@ canvas {
     width: 50px;
   }
 
-  #resetBtn {
+  #resetBtn, #mainResetBtn {
     bottom: 3vh;
-    left: 3vw;
     font-size: 14px;
     padding: 10px 14px;
+  }
+
+  #resetBtn {
+    left: 3vw;
+  }
+
+  #mainResetBtn {
+    right: 3vw;
   }
 }
 
@@ -511,12 +677,18 @@ canvas {
     height: 55px;
   }
 
-  #resetBtn {
+  #resetBtn, #mainResetBtn {
     bottom: 3vh;
-    right: 3vw;
-    left: auto;
     font-size: 14px;
     padding: 8px 14px;
+  }
+
+  #resetBtn {
+    left: 3vw;
+  }
+
+  #mainResetBtn {
+    right: 3vw;
   }
 
   #prompt {
@@ -529,7 +701,7 @@ canvas {
 </head>
 <body>
 
-  <div id="prompt">Paint, Overlay, Scrape.</div>
+  <div id="prompt">Paint, Gradient, Erase, Overlay, Scrape.</div>
 
   <div id="title">Draw, Hide, and Scratch to reveal!</div>
   
@@ -539,13 +711,19 @@ canvas {
     <button class="btn yellow" data-color="rgb(255, 187, 0)"></button>
     <button class="btn orange" data-color="rgb(255, 77, 0)"></button>
     <button class="btn blue" data-color="rgb(125, 244, 255)"></button>
-   
+    <button class="btn gradient" id="gradientBtn">🌈</button>
+    <button class="btn eraser" id="eraserBtn">⚪</button>
+    <div id="brushSizeContainer">
+      <input type="range" id="brushSizeSlider" min="5" max="50" value="30" step="1">
+      <span id="brushSizeLabel">30px</span>
+    </div>
   </div>
 
   <div id="overlayControl">
     <button class="btn black" id="overlayBtn">Hide</button>
   </div>
   <button class="btn" id="resetBtn">Reset</button>
+  <button class="btn" id="mainResetBtn">Reset</button>
   <canvas id="colorCanvas"></canvas>
   
   <canvas id="overlayCanvas" class="hidden"></canvas>
@@ -600,8 +778,27 @@ canvas {
     let painting = false;
     let currentColor = 'rgb(255, 0, 221)';
     let isScratching = false;
+    let isGradientMode = false;
+    let isEraserMode = false;
+    let gradientColors = [];
+    let gradientIndex = 0;
+    let colorTimer = 0;
+    let colorDuration = 500; // milliseconds per color
+    let lastColorChangeTime = 0;
+    let currentGradientColor = null;
+    let nextGradientColor = null;
+    let colorTransitionProgress = 0;
+    let brushSize = 30; // Default brush size
+    let eraserAudioTimer = 0; // Timer to control eraser audio frequency
+    let lastPlayedNote = null; // Track last played note to avoid repetition
+    let noteChangeThreshold = 80; // ms between potential note changes
+    let eraserMoving = false; // Track if eraser is actively moving
+    let eraserPath = []; // Track eraser path for consistent audio
 
     let synth;
+    let currentNote = null;
+    let noteScheduler = null;
+    let playingNotes = new Set(); // Track currently playing notes for overlapping
 
     const colorNotes = {
       pink: "C4",
@@ -610,6 +807,14 @@ canvas {
       orange: "F4",
       blue: "G4"
     };
+
+    const colors = [
+      { name: 'pink', rgb: 'rgb(255, 0, 221)', r: 255, g: 0, b: 221 },
+      { name: 'purple', rgb: 'rgb(92, 0, 157)', r: 92, g: 0, b: 157 },
+      { name: 'yellow', rgb: 'rgb(255, 187, 0)', r: 255, g: 187, b: 0 },
+      { name: 'orange', rgb: 'rgb(255, 77, 0)', r: 255, g: 77, b: 0 },
+      { name: 'blue', rgb: 'rgb(125, 244, 255)', r: 125, g: 244, b: 255 }
+    ];
 
     // Initialize audio context on first user interaction
     async function initAudio() {
@@ -625,10 +830,42 @@ canvas {
       }
     }
 
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
     function setColor(color) {
       initAudio();
       currentColor = color;
+      isGradientMode = false;
+      isEraserMode = false;
       console.log('Color set to:', color);
+    }
+
+    function setGradientMode() {
+      initAudio();
+      isGradientMode = true;
+      isEraserMode = false;
+      gradientColors = shuffleArray(colors);
+      gradientIndex = 0;
+      colorTimer = 0;
+      lastColorChangeTime = Date.now();
+      currentGradientColor = gradientColors[0];
+      nextGradientColor = gradientColors[1];
+      colorTransitionProgress = 0;
+      console.log('Gradient mode activated with colors:', gradientColors);
+    }
+
+    function setEraserMode() {
+      initAudio();
+      isEraserMode = true;
+      isGradientMode = false;
+      console.log('Eraser mode activated');
     }
 
     function addOverlay() {
@@ -637,6 +874,7 @@ canvas {
       document.getElementById('controls').style.display = 'none';
       document.getElementById('overlayControl').style.display = 'none';
       document.getElementById('resetBtn').style.display = 'inline-block';
+      document.getElementById('mainResetBtn').style.display = 'none';
       octx.fillStyle = 'black';
       octx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
       isScratching = true;
@@ -659,6 +897,7 @@ canvas {
       document.getElementById('controls').style.display = 'flex';
       document.getElementById('overlayControl').style.display = 'block';
       document.getElementById('resetBtn').style.display = 'none';
+      document.getElementById('mainResetBtn').style.display = 'inline-block';
       isScratching = false;
 
       if (!isTouchDevice) {
@@ -669,22 +908,197 @@ canvas {
 
     function getColorAtPixel(x, y) {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const r = pixel[0], g = pixel[1], b = pixel[2];
+      const r = pixel[0], g = pixel[1], b = pixel[2], a = pixel[3];
+      
+      // If pixel is transparent or white, return null
+      if (a === 0 || (r === 255 && g === 255 && b === 255)) return null;
+      
+      // Check for exact color matches first
       if (r === 255 && g === 0 && b === 221) return 'pink';
       if (r === 92 && g === 0 && b === 157) return 'purple';
       if (r === 255 && g === 187 && b === 0) return 'yellow';
       if (r === 255 && g === 77 && b === 0) return 'orange';
       if (r === 125 && g === 244 && b === 255) return 'blue';
-      return null;
+      
+      // For gradient colors, find the closest match
+      let closestColor = null;
+      let minDistance = Infinity;
+      
+      for (const color of colors) {
+        const distance = Math.sqrt(
+          Math.pow(r - color.r, 2) + 
+          Math.pow(g - color.g, 2) + 
+          Math.pow(b - color.b, 2)
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestColor = color.name;
+        }
+      }
+      
+      // Only return a color if it's reasonably close (not just random pixels)
+      return minDistance < 100 ? closestColor : null;
     }
 
     async function playNote(colorName) {
       const note = colorNotes[colorName];
       if (note && audioInitialized && synth) {
         try {
-          synth.triggerAttackRelease(note, "8n");
+          if (isGradientMode) {
+            // For gradient mode, play longer overlapping notes
+            synth.triggerAttackRelease(note, "4n");
+          } else {
+            synth.triggerAttackRelease(note, "8n");
+          }
         } catch (error) {
           console.log('Audio playback error:', error);
+        }
+      }
+    }
+
+    function interpolateColor(color1, color2, progress) {
+      const r = Math.round(color1.r + (color2.r - color1.r) * progress);
+      const g = Math.round(color1.g + (color2.g - color1.g) * progress);
+      const b = Math.round(color1.b + (color2.b - color1.b) * progress);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function updateGradientColor() {
+      if (!isGradientMode) return currentColor;
+
+      const now = Date.now();
+      const elapsed = now - lastColorChangeTime;
+      
+      // Calculate transition progress (0 to 1)
+      colorTransitionProgress = Math.min(elapsed / colorDuration, 1);
+      
+      // If we've completed the transition, move to next color
+      if (colorTransitionProgress >= 1) {
+        gradientIndex = (gradientIndex + 1) % gradientColors.length;
+        currentGradientColor = gradientColors[gradientIndex];
+        nextGradientColor = gradientColors[(gradientIndex + 1) % gradientColors.length];
+        lastColorChangeTime = now;
+        colorTransitionProgress = 0;
+        
+        // Play overlapping note for the new color in gradient mode
+        playNote(currentGradientColor.name);
+      }
+      
+      // Return interpolated color between current and next
+      return interpolateColor(currentGradientColor, nextGradientColor, colorTransitionProgress);
+    }
+
+    function getColorNameFromRGB(rgbString) {
+      // Parse rgb string to get r, g, b values
+      const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (!match) return null;
+      
+      const r = parseInt(match[1]);
+      const g = parseInt(match[2]);
+      const b = parseInt(match[3]);
+      
+      // Find closest color match
+      let closestColor = null;
+      let minDistance = Infinity;
+      
+      for (const color of colors) {
+        const distance = Math.sqrt(
+          Math.pow(r - color.r, 2) + 
+          Math.pow(g - color.g, 2) + 
+          Math.pow(b - color.b, 2)
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestColor = color.name;
+        }
+      }
+      
+      return closestColor;
+    }
+
+    function getRandomColorForEraser() {
+      // Return a random color from the palette for eraser audio
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      return colors[randomIndex].name;
+    }
+
+    function shouldPlayEraserAudio() {
+      // Play audio more frequently for consistent sound - every 60ms
+      const now = Date.now();
+      if (now - eraserAudioTimer > 60) {
+        eraserAudioTimer = now;
+        return true;
+      }
+      return false;
+    }
+
+    function playNoteIfDifferent(colorName, forcePlay = false) {
+      // Play a note if it's different from the last one, or if forced
+      const now = Date.now();
+      if (colorName && (forcePlay || colorName !== lastPlayedNote || now - eraserAudioTimer > noteChangeThreshold)) {
+        playNote(colorName);
+        lastPlayedNote = colorName;
+        return true;
+      }
+      return false;
+    }
+
+    function getDetailedColorSample(x, y, radius = 8) {
+      // More intensive sampling for gradient detection
+      const samples = [];
+      const step = 2; // Sample every 2 pixels for detailed coverage
+      
+      // Sample in a circular pattern around the point
+      for (let angle = 0; angle < 360; angle += 45) {
+        const rad = (angle * Math.PI) / 180;
+        const px = Math.round(x + Math.cos(rad) * radius);
+        const py = Math.round(y + Math.sin(rad) * radius);
+        
+        if (px >= 0 && py >= 0 && px < colorCanvas.width && py < colorCanvas.height) {
+          const color = getColorAtPixel(px, py);
+          if (color) samples.push(color);
+        }
+      }
+      
+      // Also sample the center and immediate neighbors
+      const centerSamples = [
+        [x, y], [x-1, y], [x+1, y], [x, y-1], [x, y+1]
+      ];
+      
+      for (const [px, py] of centerSamples) {
+        if (px >= 0 && py >= 0 && px < colorCanvas.width && py < colorCanvas.height) {
+          const color = getColorAtPixel(px, py);
+          if (color) samples.push(color);
+        }
+      }
+      
+      if (samples.length === 0) return null;
+      
+      // Return the most frequently occurring color
+      const colorCounts = {};
+      samples.forEach(color => {
+        colorCounts[color] = (colorCounts[color] || 0) + 1;
+      });
+      
+      return Object.keys(colorCounts).reduce((a, b) => 
+        colorCounts[a] > colorCounts[b] ? a : b
+      );
+    }
+
+    function maintainEraserAudio() {
+      // Continuous audio maintenance for eraser - plays even when not moving much
+      if (isEraserMode && painting && eraserMoving) {
+        const lastPoint = eraserPath[eraserPath.length - 1];
+        if (lastPoint) {
+          const colorName = getDetailedColorSample(lastPoint.x, lastPoint.y);
+          if (colorName) {
+            // Play note if we haven't played one recently or if color changed
+            const now = Date.now();
+            if (now - eraserAudioTimer > 80 || colorName !== lastPlayedNote) {
+              playNoteIfDifferent(colorName);
+              eraserAudioTimer = now;
+            }
+          }
         }
       }
     }
@@ -693,16 +1107,63 @@ canvas {
       if (!painting) return;
 
       if (!isScratching) {
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = currentColor;
-        ctx.lineWidth = 30;
-        ctx.lineCap = "round";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        const colorName = getColorAtPixel(x, y);
-        if (colorName) playNote(colorName);
+        if (isEraserMode) {
+          // Add current position to eraser path
+          eraserPath.push({x, y, timestamp: Date.now()});
+          // Keep only recent path points (last 10 points)
+          if (eraserPath.length > 10) {
+            eraserPath.shift();
+          }
+          
+          eraserMoving = true;
+          
+          // Enhanced eraser mode - continuous detailed color sampling
+          const colorName = getDetailedColorSample(x, y, brushSize / 3);
+          
+          if (colorName) {
+            // Always try to play audio for eraser to maintain consistency
+            const now = Date.now();
+            const timeSinceLastNote = now - eraserAudioTimer;
+            
+            // Play if it's a new color or if enough time has passed for continuity
+            if (colorName !== lastPlayedNote || timeSinceLastNote > 60) {
+              playNoteIfDifferent(colorName, timeSinceLastNote > 120); // Force play if too much time passed
+            }
+          }
+          
+          ctx.save();
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2, false);
+          ctx.fill();
+          ctx.restore();
+        } else if (isGradientMode) {
+          // Gradient mode - use smooth color transitions with synchronized audio
+          const gradientColor = updateGradientColor();
+          
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = gradientColor;
+          ctx.lineWidth = brushSize;
+          ctx.lineCap = "round";
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+        } else {
+          // Normal drawing mode
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = currentColor;
+          ctx.lineWidth = brushSize;
+          ctx.lineCap = "round";
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          
+          // Play note for current color
+          const colorName = getColorNameFromRGB(currentColor);
+          if (colorName) playNote(colorName);
+        }
       } else {
+        // Scratching mode - improved for gradient detection
         octx.save();
         octx.globalCompositeOperation = 'destination-out';
         octx.beginPath();
@@ -710,8 +1171,11 @@ canvas {
         octx.fill();
         octx.restore();
 
-        const colorName = getColorAtPixel(x, y);
-        if (colorName) playNote(colorName);
+        // Use detailed color sampling for scraper too
+        const colorName = getDetailedColorSample(x, y, 15);
+        if (colorName) {
+          playNoteIfDifferent(colorName);
+        }
       }
     }
 
@@ -738,15 +1202,43 @@ canvas {
       e.preventDefault();
       initAudio();
       painting = true;
+      
+      // Reset note tracking and eraser state when starting a new stroke
+      lastPlayedNote = null;
+      eraserAudioTimer = 0;
+      eraserMoving = false;
+      eraserPath = [];
+      
       const coords = getEventCoords(e);
       ctx.beginPath();
       ctx.moveTo(coords.x, coords.y);
+      
+      // If in gradient mode, reset color timing when starting new stroke
+      if (isGradientMode) {
+        gradientColors = shuffleArray(colors); // Re-randomize for each stroke
+        gradientIndex = 0;
+        lastColorChangeTime = Date.now();
+        currentGradientColor = gradientColors[0];
+        nextGradientColor = gradientColors[1];
+        colorTransitionProgress = 0;
+        // Play initial overlapping note immediately
+        if (audioInitialized && synth) {
+          try {
+            synth.triggerAttackRelease(colorNotes[currentGradientColor.name], "2n");
+          } catch (error) {
+            console.log('Audio playback error:', error);
+          }
+        }
+      }
+      
       draw(coords.x, coords.y);
     }
 
     function endDraw(e) {
       e.preventDefault();
       painting = false;
+      eraserMoving = false;
+      eraserPath = [];
       ctx.beginPath();
     }
 
@@ -773,7 +1265,43 @@ canvas {
       });
     });
 
-    // Add event listeners for overlay and reset buttons
+    // Add event listeners for gradient button
+    document.getElementById('gradientBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      setGradientMode();
+    });
+
+    document.getElementById('gradientBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      setGradientMode();
+    });
+
+    // Add event listeners for eraser button
+    document.getElementById('eraserBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      setEraserMode();
+    });
+
+    document.getElementById('eraserBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      setEraserMode();
+    });
+
+    // Add event listeners for brush size slider
+    const brushSizeSlider = document.getElementById('brushSizeSlider');
+    const brushSizeLabel = document.getElementById('brushSizeLabel');
+    
+    brushSizeSlider.addEventListener('input', function(e) {
+      brushSize = parseInt(e.target.value);
+      brushSizeLabel.textContent = brushSize + 'px';
+    });
+
+    brushSizeSlider.addEventListener('change', function(e) {
+      brushSize = parseInt(e.target.value);
+      brushSizeLabel.textContent = brushSize + 'px';
+    });
+
+    // Add event listeners for overlay button
     document.getElementById('overlayBtn').addEventListener('click', function(e) {
       e.preventDefault();
       addOverlay();
@@ -784,12 +1312,23 @@ canvas {
       addOverlay();
     });
 
+    // Add event listeners for reset buttons
     document.getElementById('resetBtn').addEventListener('click', function(e) {
       e.preventDefault();
       resetCanvas();
     });
 
     document.getElementById('resetBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      resetCanvas();
+    });
+
+    document.getElementById('mainResetBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      resetCanvas();
+    });
+
+    document.getElementById('mainResetBtn').addEventListener('touchend', function(e) {
       e.preventDefault();
       resetCanvas();
     });
@@ -838,6 +1377,9 @@ canvas {
     // Ensure audio context is started on any user interaction
     document.addEventListener('touchstart', initAudio, { once: true });
     document.addEventListener('click', initAudio, { once: true });
+
+    // Continuous audio maintenance for eraser
+    setInterval(maintainEraserAudio, 50); // Check every 50ms for continuous audio
   </script>
 </body>
 </html>
