@@ -2,25 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Draw with music!</title>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
   <style>
-    @font-face {
-  font-family: "CLT Apfel Grotezk";
-  src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
+/* Overlay cross button for stencil mode */
+#stencilCloseBtn {
+  position: fixed;
+  top: clamp(10px, 2vh, 20px);
+  right: clamp(10px, 2vw, 20px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #000 0%, #000 49%, #fff 49%, #fff 51%, #000 51%);
+  border: 3px solid #fff;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 100;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
-  font-family: "CLT Apfel Grotezk", sans-serif;
-  background: url('white-wall.jpg') no-repeat center center fixed;
-  background-size: cover;
-  touch-action: none;
+#stencilCloseBtn:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 4px;
+  background: white;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
+#stencilCloseBtn:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 4px;
+  background: white;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+#stencilCloseBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+    @font-face {
+      font-family: "CLT Apfel Grotezk";
+      src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      font-family: "CLT Apfel Grotezk", sans-serif;
+      background: url('white-wall.jpg') no-repeat center center fixed;
+      background-size: cover;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
 
 #title {
   position: fixed;
@@ -77,70 +129,217 @@ canvas {
   z-index: 1;
   width: 100vw;
   height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  touch-action: none;
 }
 
-#controls {
-  position: fixed;
-  top: clamp(60px, 12vh, 100px);
-  left: clamp(5px, 1vw, 15px);
-  z-index: 9;
-  background: rgba(255, 255, 255, 0.95);
-  padding: clamp(0.8rem, 1rem, 1.2rem);
-  border-radius: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.8rem, 1rem, 1.2rem);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-#brushCursor {
-  position: fixed;
-  width: clamp(40px, 8vw, 120px);
-  height: auto;
+#aOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
   pointer-events: none;
-  z-index: 11;
-  transition: top 0.01s linear, left 0.01s linear;
+  display: none;
 }
 
-#scraperCursor {
+/* Circular dropdown styles */
+#circularDropdown {
   position: fixed;
-  width: clamp(40px, 8vw, 120px);
-  height: auto;
-  pointer-events: none;
-  z-index: 11;
-  transition: top 0.01s linear, left 0.01s linear;
+  top: clamp(80px, 15vh, 120px);
+  left: clamp(20px, 4vw, 40px);
+  z-index: 15;
 }
 
-/* Hide cursors on touch devices */
-@media (hover: none) and (pointer: coarse) {
-  #brushCursor, #scraperCursor {
-    display: none !important;
-  }
-}
-
-.btn {
-  padding: 0;
-  font-family: "CLT Apfel Grotezk", sans-serif;
-  font-size: clamp(0.7rem, 1rem, 1.1rem);
-  color: white;
-  border: none;
+#dropdownToggle {
+  width: clamp(60px, 10vw, 80px);
+  height: clamp(60px, 10vw, 80px);
   border-radius: 50%;
+  background: linear-gradient(135deg, #ff179e, #9855fe, #45a0fc);
+  border: none;
+  color: white;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
-  width: clamp(55px, 8vw, 75px);
-  height: clamp(55px, 8vw, 75px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-weight: bold;
 }
 
-.btn:hover {
+#dropdownToggle:hover {
   transform: scale(1.1);
-  filter: brightness(1.2);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+#dropdownToggle.selected {
+  box-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fff;
+}
+
+#dropdownMenu {
+  position: absolute;
+  top: calc(100% + 20px);
+  left: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+#dropdownMenu.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.dropdown-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.dropdown-item {
+  position: relative;
+  width: clamp(50px, 8vw, 65px);
+  height: clamp(50px, 8vw, 65px);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.7rem, 1.2vw, 1rem);
+  color: white;
+  font-family: "CLT Apfel Grotezk", sans-serif;
+  font-weight: bold;
+  transform: none;
+}
+
+.dropdown-item:hover {
+  transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+.dropdown-item.selected {
+  box-shadow: 0 0 15px #fff, 0 0 25px #fff, 0 0 35px #fff;
+}
+
+#brushSizeContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255, 192, 203, 0.2);
+  border-radius: 15px;
+  border: 2px solid rgb(255, 0, 221);
+  backdrop-filter: blur(10px);
+  transform: none;
+}
+
+/* A Mode Cancel Button */
+#aCancelBtn {
+  position: fixed;
+  top: clamp(20px, 4vh, 40px);
+  right: clamp(20px, 4vw, 40px);
+  width: clamp(50px, 8vw, 70px);
+  height: clamp(50px, 8vw, 70px);
+  border-radius: 50%;
+  background: linear-gradient(45deg, #000 0%, #000 49%, #fff 49%, #fff 51%, #000 51%);
+  border: 3px solid #666;
+  color: white;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 20;
+}
+
+#aCancelBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Letter Grid Modal */
+#letterGridModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 25;
+}
+
+#letterGrid {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+.letter-item {
+  width: clamp(60px, 8vw, 80px);
+  height: clamp(60px, 8vw, 80px);
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  color: #333;
+}
+
+.letter-item:hover {
+  transform: scale(1.1);
+  border-color: #ff179e;
+  background: #f0f0f0;
+}
+
+#closeLetterGrid {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #ff179e;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Color button styles */
 .pink { background-color: rgb(255, 0, 221); }
 .purple { background-color: rgb(92, 0, 157); }
 .yellow { background-color: rgb(255, 187, 0); }
@@ -186,18 +385,12 @@ canvas {
   background-color: #f0f0f0; 
   color: #333;
   border: 3px solid #999;
-  font-weight: bold;
 }
 
-#brushSizeContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  background: rgba(255, 192, 203, 0.2);
-  border-radius: 15px;
-  border: 2px solid rgb(255, 0, 221);
+.a-button {
+  background-color: #000;
+  color: white;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
 }
 
 #brushSizeSlider {
@@ -248,76 +441,10 @@ canvas {
 }
 
 #brushSizeLabel {
-  font-size: clamp(0.6rem, 0.8rem, 1rem);
+  font-size: clamp(0.6rem, 1vw, 1rem);
   font-weight: bold;
   color: rgb(255, 0, 221);
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-.black { 
-  background-color: black; 
-  width: clamp(50px, 7vw, 70px);
-  height: clamp(50px, 7vw, 70px);
-  border-radius: 15px;
-}
-
-#overlayControl {
-  position: fixed;
-  top: clamp(50px, 10vh, 80px);
-  right: clamp(5px, 1vw, 15px);
-  z-index: 9;
-  font-size: clamp(0.7rem, 1rem, 1.1rem);
-  border: none;
-  border-radius: 15px;
-  color: white;
-  background: rgba(0, 0, 0, 0.9);
-  padding: clamp(0.8rem, 1rem, 1.2rem);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-#index-btn {
-  position: absolute;
-  top: clamp(0.5rem, 1rem, 1.5rem);
-  left: clamp(0.5rem, 1rem, 1.5rem);
-  padding: clamp(0.3rem, 0.5rem, 0.8rem) clamp(0.5rem, 1rem, 1.2rem);
-  background-color: #000000;
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-family: "CLT Apfel Grotezk";
-  z-index: 1002;
-  font-size: clamp(0.7rem, 1rem, 1.1rem);
-  box-shadow: 2px 2px 2px #ff179e;
-  transition: background-color 0.2s ease;
-}
-
-#index-btn:hover {
-  background: linear-gradient(90deg,#ff179e, #9855fe, #45a0fc);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  border-color: #ff179e;
-}
-
-#resetBtn {
-  position: fixed;
-  bottom: clamp(10px, 3vh, 25px);
-  left: clamp(10px, 3vw, 25px);
-  background: linear-gradient(90deg, #ff179e, #9855fe, #45a0fc);
-  color: rgb(0, 0, 0);
-  z-index: 10;
-  display: none;
-  padding: clamp(0.4rem, 0.6rem, 0.8rem) clamp(0.6rem, 1rem, 1.2rem);
-  font-weight: bold;
-  border: none;
-  border-radius: 15px;
-  font-size: clamp(0.7rem, 1rem, 1.1rem);
-}
-
-#resetBtn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(90deg, #c1ff3c, #55fef8,#45a0fc);
-  color: rgb(255, 255, 255);
 }
 
 #mainResetBtn {
@@ -368,426 +495,388 @@ canvas {
   display: none;
 }
 
-/* iPad Portrait (768px-834px width) */
-@media (min-width: 768px) and (max-width: 834px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
-  #controls {
-    top: clamp(60px, 8vh, 80px);
+/* Responsive positioning for dropdown items */
+@media (max-width: 900px) {
+  #circularDropdown {
+    top: clamp(60px, 10vh, 90px);
     left: clamp(10px, 2vw, 20px);
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 20px;
-    max-width: 55vw;
-    justify-content: flex-start;
   }
-
-  #overlayControl {
-    top: clamp(60px, 8vh, 80px);
-    right: clamp(10px, 2vw, 20px);
-    padding: 20px;
+  #dropdownToggle {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
   }
-
-  .btn {
-    width: 70px;
-    height: 70px;
-    font-size: 16px;
+  .dropdown-item {
+    width: 38px;
+    height: 38px;
+    font-size: 0.8rem;
   }
-
-  .black {
-    width: 65px;
-    height: 65px;
+  .dropdown-row {
+    gap: 8px;
   }
-
-  #title {
-    font-size: 28px;
-    padding: 16px;
-  }
-
-  #prompt {
-    font-size: 18px;
-    padding: 20px 24px;
-    top: 85%;
-  }
-
-  #resetBtn, #mainResetBtn, #cameraBtn {
-    font-size: 18px;
-    padding: 14px 18px;
-    bottom: 5vh;
-  }
-
-  #resetBtn {
-    left: 5vw;
-  }
-
-  #mainResetBtn {
-    right: 5vw;
-  }
-
-  #cameraBtn {
-    left: 5vw;
-  }
-}
-
-/* iPad Landscape (1024px+ width, max 1366px) - New optimized styles */
-@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
-  #title {
-    font-size: 24px;
-    padding: 12px;
-    top: 0;
-    height: auto;
-  }
-
-  #prompt {
-    font-size: 16px;
-    padding: 16px 20px;
-    top: 85%;
-    max-width: 80vw;
-  }
-
-  /* Position controls on the left side with more spacing */
-  #controls {
-    top: 15vh;
-    left: 2vw;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 18px;
-    padding: 25px;
-    max-width: 22vw;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    justify-content: flex-start;
-  }
-
-  /* Position overlay control on the right side */
-  #overlayControl {
-    top: 15vh;
-    right: 2vw;
-    padding: 25px;
-    background: rgba(0, 0, 0, 0.9);
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  /* Larger, more touch-friendly buttons */
-  .btn {
-    width: 80px;
-    height: 80px;
-    font-size: 16px;
-  }
-
-  .black {
-    width: 75px;
-    height: 75px;
-  }
-
-  /* Position reset buttons */
-  #resetBtn, #mainResetBtn, #cameraBtn {
-    font-size: 16px;
-    padding: 12px 20px;
-    bottom: 4vh;
-    border-radius: 20px;
-  }
-
-  #resetBtn {
-    left: 4vw;
-  }
-
-  #mainResetBtn {
-    right: 4vw;
-  }
-
-  #cameraBtn {
-    left: 4vw;
-  }
-
-  /* Adjust home button for landscape */
-  #index-btn {
-    top: 2vh;
-    left: 2vw;
-    font-size: 14px;
-    padding: 8px 16px;
-  }
-
-  /* Make cursors slightly smaller for landscape */
-  #brushCursor, #scraperCursor {
-    width: 50px;
-  }
-}
-
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
-  #controls {
-    top: auto;
-    bottom: 18vh;
-    left: 5vw;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    max-width: 50vw;
-    gap: 12px;
-    padding: 16px;
-  }
-
   #brushSizeContainer {
-    order: -1; /* Put slider first on mobile */
-    width: 100%;
-    margin-bottom: 8px;
+    padding: 6px;
   }
-
   #brushSizeSlider {
-    width: 120px;
+    width: 48px;
   }
-
-  #overlayControl {
-    top: auto;
-    bottom: 18vh;
-    right: 5vw;
-    padding: 16px;
+  #aCancelBtn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+    top: clamp(10px, 2vh, 20px);
+    right: clamp(10px, 2vw, 20px);
   }
-
-  .btn {
-    width: 55px;
-    height: 55px;
-    font-size: 14px;
-  }
-
-  .black {
-    width: 50px;
-    height: 50px;
-  }
-
-  #title {
-    font-size: 24px;
-    padding: 12px;
-  }
-
-  #prompt {
-    font-size: 16px;
-    padding: 16px 20px;
-    top: 85%;
-  }
-
-  #resetBtn, #mainResetBtn, #cameraBtn {
-    font-size: 16px;
-    padding: 12px 16px;
-    bottom: 5vh;
-  }
-
-  #resetBtn {
-    left: 5vw;
-  }
-
-  #mainResetBtn {
-    right: 5vw;
-  }
-
-  #cameraBtn {
-    left: 5vw;
-  }
-
-  #brushCursor, #scraperCursor {
-    width: 60px;
-  }
-}
-
-/* Extra small screens */
-@media (max-width: 480px) {
-  #controls {
-    bottom: 15vh;
-    left: 3vw;
-    padding: 12px;
-    gap: 10px;
-    max-width: 58vw;
-  }
-
-  #overlayControl {
-    bottom: 15vh;
-    right: 3vw;
-    padding: 12px;
-  }
-
-  .btn {
-    width: 50px;
-    height: 50px;
-    font-size: 12px;
-  }
-
-  .black {
-    width: 45px;
-    height: 45px;
-  }
-
-  #title {
-    font-size: 20px;
+  #letterGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
     padding: 10px;
   }
-
+  .letter-item {
+    width: clamp(38px, 10vw, 48px);
+    height: clamp(38px, 10vw, 48px);
+    font-size: clamp(0.7rem, 2vw, 1rem);
+  }
+  #mainResetBtn, #cameraBtn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 12px;
+  }
+  #title {
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+    padding: clamp(0.3rem, 0.6rem, 0.8rem);
+  }
   #prompt {
-    font-size: 14px;
+    top: 88%;
+    font-size: clamp(0.7rem, 1vw, 1rem);
+    padding: 0.7rem 1.2rem;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  #circularDropdown {
+    top: clamp(40px, 7vh, 60px);
+    left: clamp(6px, 1vw, 12px);
+  }
+  #dropdownToggle {
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+  }
+  .dropdown-item {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+  }
+  .dropdown-row {
+    gap: 5px;
+  }
+  #brushSizeContainer {
+    padding: 4px;
+  }
+  #brushSizeSlider {
+    width: 32px;
+  }
+  #aCancelBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    top: clamp(6px, 1vh, 12px);
+    right: clamp(6px, 1vw, 12px);
+  }
+  #letterGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 6px;
+  }
+  .letter-item {
+    width: clamp(28px, 8vw, 36px);
+    height: clamp(28px, 8vw, 36px);
+    font-size: clamp(0.6rem, 2vw, 0.9rem);
+  }
+  #mainResetBtn, #cameraBtn {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 10px;
+  }
+  #title {
+    font-size: clamp(0.7rem, 1vw, 1rem);
+    padding: clamp(0.2rem, 0.4rem, 0.6rem);
+  }
+  #prompt {
+    top: 86%;
+    font-size: clamp(0.6rem, 0.8vw, 0.9rem);
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  #circularDropdown {
+    top: clamp(30px, 6vh, 40px);
+    left: clamp(6px, 1vw, 12px);
+  }
+  #title {
+    font-size: clamp(0.7rem, 1vw, 1rem);
+    padding: clamp(0.2rem, 0.4rem, 0.6rem);
+  }
+  #prompt {
     top: 80%;
-    padding: 12px 16px;
+    font-size: clamp(0.6rem, 0.8vw, 0.9rem);
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
   }
-
-  #brushCursor, #scraperCursor {
-    width: 50px;
+  .dropdown-row {
+    gap: 4px;
   }
-
-  #resetBtn, #mainResetBtn, #cameraBtn {
-    bottom: 3vh;
-    font-size: 14px;
-    padding: 10px 14px;
+  .dropdown-item {
+    width: 24px;
+    height: 24px;
+    font-size: 0.6rem;
   }
-
-  #resetBtn {
-    left: 3vw;
+  #dropdownToggle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
   }
-
-  #mainResetBtn {
-    right: 3vw;
-  }
-
-  #cameraBtn {
-    left: 3vw;
-  }
-}
-
-/* Large desktop screens */
-@media (min-width: 1367px) {
-  #title {
-    font-size: clamp(1.5rem, 2.5vw, 3rem);
-  }
-
-  #prompt {
-    font-size: clamp(1rem, 1.2vw, 1.5rem);
-  }
-
-  .btn {
-    width: 85px;
-    height: 85px;
-    font-size: clamp(0.9rem, 1.2rem, 1.3rem);
-  }
-
-  .black {
-    width: 80px;
-    height: 80px;
-  }
-
-  #controls {
-    gap: 20px;
-    padding: 30px;
-  }
-
-  #brushCursor, #scraperCursor {
-    width: clamp(80px, 6vw, 150px);
-  }
-}
-
-/* Additional landscape phone optimization */
-@media (max-width: 896px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
-  #title {
-    font-size: 18px;
-    padding: 8px;
-  }
-
-  #controls {
-    top: 12vh;
-    left: 2vw;
-    flex-direction: row;
-    gap: 12px;
-    padding: 15px;
-    max-width: 28vw;
-  }
-
-  #overlayControl {
-    top: 12vh;
-    right: 2vw;
-    padding: 15px;
-  }
-
-  .btn {
-    width: 60px;
-    height: 60px;
-    font-size: 14px;
-  }
-
-  .black {
-    width: 55px;
-    height: 55px;
-  }
-
-  #resetBtn, #mainResetBtn, #cameraBtn {
-    bottom: 3vh;
-    font-size: 14px;
-    padding: 8px 14px;
-  }
-
-  #resetBtn {
-    left: 3vw;
-  }
-
-  #mainResetBtn {
-    right: 3vw;
-  }
-
-  #cameraBtn {
-    left: 3vw;
-  }
-
-  #prompt {
-    top: 75%;
-    font-size: 14px;
-    padding: 12px 16px;
+  #aCancelBtn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
   }
 }
   </style>
 </head>
 <body>
 
-  <div id="prompt">Paint, Gradient, Erase, Overlay, Scrape.</div>
+  <div id="prompt">Paint, Gradient, Erase, A/a Mode, Scrape.</div>
 
   <div id="title">Draw, Hide, and Scratch to reveal!</div>
   
-  <div id="controls">
-    <button class="btn pink" data-color="rgb(255, 0, 221)"></button>
-    <button class="btn purple" data-color="rgb(92, 0, 157)"></button>
-    <button class="btn yellow" data-color="rgb(255, 187, 0)"></button>
-    <button class="btn orange" data-color="rgb(255, 77, 0)"></button>
-    <button class="btn blue" data-color="rgb(125, 244, 255)"></button>
-    <button class="btn gradient" id="gradientBtn">🌈</button>
-    <button class="btn eraser" id="eraserBtn">⚪</button>
-    <div id="brushSizeContainer">
-      <input type="range" id="brushSizeSlider" min="5" max="50" value="30" step="1">
-      <span id="brushSizeLabel">30px</span>
+  <!-- Circular Dropdown -->
+  <div id="circularDropdown">
+    <button id="dropdownToggle">☰</button>
+    <div id="dropdownMenu">
+      <!-- Colors row -->
+      <div class="dropdown-row">
+        <button class="dropdown-item pink" data-color="rgb(255, 0, 221)"></button>
+        <button class="dropdown-item purple" data-color="rgb(92, 0, 157)"></button>
+        <button class="dropdown-item yellow" data-color="rgb(255, 187, 0)"></button>
+        <button class="dropdown-item orange" data-color="rgb(255, 77, 0)"></button>
+        <button class="dropdown-item blue" data-color="rgb(125, 244, 255)"></button>
+      </div>
+      
+      <!-- Tools row -->
+      <div class="dropdown-row">
+        <button class="dropdown-item gradient" id="gradientBtn">🌈</button>
+        <button class="dropdown-item eraser" id="eraserBtn">⚪</button>
+        
+        <!-- Brush size container positioned to the right -->
+        <div id="brushSizeContainer">
+          <input type="range" id="brushSizeSlider" min="5" max="50" value="30" step="1">
+          <span id="brushSizeLabel">30px</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- A/a button positioned to the right of dropdown toggle -->
+    <button class="dropdown-item a-button" id="aBtn" style="position: absolute; top: 0; left: calc(100% + 20px);">A/a</button>
+  </div>
+
+  <!-- Letter Grid Modal -->
+  <div id="letterGridModal">
+    <div id="letterGrid">
+      <button id="closeLetterGrid">✕</button>
     </div>
   </div>
 
-  <div id="overlayControl">
-    <button class="btn black" id="overlayBtn">Hide</button>
-  </div>
-  <button class="btn" id="resetBtn">Reset</button>
-  <button class="btn" id="mainResetBtn">Reset</button>
+  <!-- A Mode Cancel Button -->
+  <button id="aCancelBtn">✕</button>
+
+  <button id="mainResetBtn">Reset</button>
   <button id="cameraBtn">📷 Save</button>
   <canvas id="colorCanvas"></canvas>
-  
-  <canvas id="overlayCanvas" class="hidden"></canvas>
-  <img src="brush.png" id="brushCursor" style="display: block;" />
-  <img src="scraper.png" id="scraperCursor" style="display: none;" />
-
+  <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
+  <canvas id="aOverlay"></canvas>
+  <button id="stencilCloseBtn">✕</button>
 
   <script>
+    // --- Digital Stencil Feature ---
+    let isStencilMode = false;
+    const stencilCloseBtn = document.getElementById('stencilCloseBtn');
+
+    // Show stencil overlay with transparent letter/digit
+    function showStencilOverlay(char) {
+      isStencilMode = true;
+      selectedLetter = char;
+      document.getElementById('letterGridModal').style.display = 'none';
+      drawStencilOverlay(char);
+      stencilCloseBtn.style.display = 'flex';
+      aOverlay.style.display = 'block';
+      // Keep dropdown and UI visible
+      document.getElementById('circularDropdown').style.zIndex = 40;
+      document.getElementById('mainResetBtn').style.zIndex = 40;
+      document.getElementById('cameraBtn').style.zIndex = 40;
+      document.getElementById('title').style.zIndex = 40;
+      document.getElementById('prompt').style.zIndex = 40;
+    }
+
+    // Draw stencil overlay: black everywhere, transparent where char is
+    function drawStencilOverlay(char) {
+      aOverlay.width = window.innerWidth;
+      aOverlay.height = window.innerHeight;
+      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+      // Fill with black
+      aCtx.globalAlpha = 1.0;
+      aCtx.fillStyle = 'black';
+      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+      // Draw transparent letter/digit
+      aCtx.save();
+      aCtx.globalCompositeOperation = 'destination-out';
+      // Calculate font size and position
+      let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
+      if (char.length > 1) fontSize *= 0.7;
+      aCtx.font = `bold ${fontSize}px "Comic Sans MS", cursive`;
+      aCtx.textAlign = 'center';
+      aCtx.textBaseline = 'middle';
+      aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
+      aCtx.restore();
+      aCtx.globalCompositeOperation = 'source-over';
+    }
+
+    // Remove stencil overlay
+    function exitStencilMode() {
+      isStencilMode = false;
+      aOverlay.style.display = 'none';
+      stencilCloseBtn.style.display = 'none';
+      // Restore z-indexes
+      document.getElementById('circularDropdown').style.zIndex = 15;
+      document.getElementById('mainResetBtn').style.zIndex = 10;
+      document.getElementById('cameraBtn').style.zIndex = 10;
+      document.getElementById('title').style.zIndex = 10;
+      document.getElementById('prompt').style.zIndex = 20;
+    }
+
+    // When resizing, redraw overlay if stencil mode is active
+    const origResizeCanvasDimensions = resizeCanvasDimensions;
+    resizeCanvasDimensions = function() {
+      colorCanvas.width = aOverlay.width = window.innerWidth;
+      colorCanvas.height = aOverlay.height = window.innerHeight;
+      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+      } else {
+        createWhiteBackground();
+      }
+      // Redraw A overlay if in A mode
+      if (isAMode && aImage) {
+        drawAOverlay();
+      }
+      // Redraw stencil overlay if active
+      if (isStencilMode && selectedLetter) {
+        drawStencilOverlay(selectedLetter);
+      }
+    }
+
+    // Stencil close button event
+    stencilCloseBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      exitStencilMode();
+    });
+    stencilCloseBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      exitStencilMode();
+    });
     const colorCanvas = document.getElementById('colorCanvas');
-    const overlayCanvas = document.getElementById('overlayCanvas');
+    const aOverlay = document.getElementById('aOverlay');
     const ctx = colorCanvas.getContext('2d');
-    const octx = overlayCanvas.getContext('2d');
+    const aCtx = aOverlay.getContext('2d');
     const backgroundImage = new Image();
     let audioInitialized = false;
     let isTouchDevice = false;
+    let isAMode = false;
+    let aImage = null;
+    let selectedLetter = 'A';
+    let selectedButton = null;
 
     // Detect touch device
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
       isTouchDevice = true;
     }
+
+    // Create letter grid
+    function createLetterGrid() {
+      const letterGrid = document.getElementById('letterGrid');
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const numbers = '0123456789';
+      
+      // Clear existing content except close button
+      const closeBtn = document.getElementById('closeLetterGrid');
+      letterGrid.innerHTML = '';
+      letterGrid.appendChild(closeBtn);
+      
+      // Add letters
+      for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        const letterItem = document.createElement('button');
+        letterItem.className = 'letter-item';
+        letterItem.textContent = letter + letter.toLowerCase();
+        letterItem.addEventListener('click', () => showStencilOverlay(letter + letter.toLowerCase()));
+        letterGrid.appendChild(letterItem);
+      }
+      // Add numbers
+      for (let i = 0; i < numbers.length; i++) {
+        const number = numbers[i];
+        const numberItem = document.createElement('button');
+        numberItem.className = 'letter-item';
+        numberItem.textContent = number;
+        numberItem.addEventListener('click', () => showStencilOverlay(number));
+        letterGrid.appendChild(numberItem);
+      }
+    }
+
+    function selectLetter(letter) {
+      selectedLetter = letter;
+      document.getElementById('letterGridModal').style.display = 'none';
+      createAImage().then(img => {
+        aImage = img;
+        if (isAMode) {
+          drawAOverlay();
+        }
+      });
+    }
+
+    // Create A image from the selected letter
+    function createAImage() {
+      return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = 1000;
+        canvas.height = 1000;
+        
+        // Fill with transparent
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Create the selected letter/number
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 600px "Comic Sans MS", cursive';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
+        
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = canvas.toDataURL();
+      });
+    }
+
+    // Initialize letter grid and A image
+    createLetterGrid();
+    createAImage().then(img => {
+      aImage = img;
+    });
 
     // Create a fallback white background
     function createWhiteBackground() {
@@ -797,7 +886,6 @@ canvas {
 
     backgroundImage.src = 'white-wall.jpg';
     backgroundImage.onerror = function() {
-      // If image fails to load, use white background
       createWhiteBackground();
     };
 
@@ -806,13 +894,74 @@ canvas {
     };
 
     function resizeCanvasDimensions() {
-      colorCanvas.width = overlayCanvas.width = window.innerWidth;
-      colorCanvas.height = overlayCanvas.height = window.innerHeight;
+      colorCanvas.width = aOverlay.width = window.innerWidth;
+      colorCanvas.height = aOverlay.height = window.innerHeight;
       
       if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
         ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
       } else {
         createWhiteBackground();
+      }
+      
+      // Redraw A overlay if in A mode
+      if (isAMode && aImage) {
+        drawAOverlay();
+      }
+    }
+
+    function drawAOverlay() {
+      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+      
+      // Fill entire canvas with black
+      aCtx.fillStyle = 'black';
+      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+      
+      // Calculate scaling to fit image in canvas while maintaining aspect ratio
+      const scale = Math.min(aOverlay.width / aImage.width, aOverlay.height / aImage.height) * 0.8;
+      const scaledWidth = aImage.width * scale;
+      const scaledHeight = aImage.height * scale;
+      const x = (aOverlay.width - scaledWidth) / 2;
+      const y = (aOverlay.height - scaledHeight) / 2;
+      
+      // Use destination-out to create transparent areas where the letter image is
+      aCtx.globalCompositeOperation = 'destination-out';
+      aCtx.drawImage(aImage, x, y, scaledWidth, scaledHeight);
+      aCtx.globalCompositeOperation = 'source-over';
+    }
+
+    function setSelectedButton(button) {
+      // Remove selection from previous button
+      if (selectedButton) {
+        selectedButton.classList.remove('selected');
+      }
+      
+      // Add selection to new button
+      if (button) {
+        button.classList.add('selected');
+        selectedButton = button;
+      }
+    }
+
+    function setAMode() {
+      initAudio();
+      isAMode = true;
+      isGradientMode = false;
+      isEraserMode = false;
+      aOverlay.style.display = 'block';
+      document.getElementById('aCancelBtn').style.display = 'flex';
+      setSelectedButton(document.getElementById('aBtn'));
+      if (aImage) {
+        drawAOverlay();
+      }
+      console.log('A mode activated with letter:', selectedLetter);
+    }
+
+    function exitAMode() {
+      isAMode = false;
+      aOverlay.style.display = 'none';
+      document.getElementById('aCancelBtn').style.display = 'none';
+      if (selectedButton === document.getElementById('aBtn')) {
+        setSelectedButton(null);
       }
     }
 
@@ -821,28 +970,27 @@ canvas {
 
     let painting = false;
     let currentColor = 'rgb(255, 0, 221)';
-    let isScratching = false;
     let isGradientMode = false;
     let isEraserMode = false;
     let gradientColors = [];
     let gradientIndex = 0;
     let colorTimer = 0;
-    let colorDuration = 500; // milliseconds per color
+    let colorDuration = 500;
     let lastColorChangeTime = 0;
     let currentGradientColor = null;
     let nextGradientColor = null;
     let colorTransitionProgress = 0;
-    let brushSize = 30; // Default brush size
-    let eraserAudioTimer = 0; // Timer to control eraser audio frequency
-    let lastPlayedNote = null; // Track last played note to avoid repetition
-    let noteChangeThreshold = 80; // ms between potential note changes
-    let eraserMoving = false; // Track if eraser is actively moving
-    let eraserPath = []; // Track eraser path for consistent audio
+    let brushSize = 30;
+    let eraserAudioTimer = 0;
+    let lastPlayedNote = null;
+    let noteChangeThreshold = 80;
+    let eraserMoving = false;
+    let eraserPath = [];
 
     let synth;
     let currentNote = null;
     let noteScheduler = null;
-    let playingNotes = new Set(); // Track currently playing notes for overlapping
+    let playingNotes = new Set();
 
     const colorNotes = {
       pink: "C4",
@@ -883,18 +1031,20 @@ canvas {
       return shuffled;
     }
 
-    function setColor(color) {
+    function setColor(color, button) {
       initAudio();
       currentColor = color;
       isGradientMode = false;
       isEraserMode = false;
+      setSelectedButton(button);
       console.log('Color set to:', color);
     }
 
-    function setGradientMode() {
+    function setGradientMode(button) {
       initAudio();
       isGradientMode = true;
       isEraserMode = false;
+      setSelectedButton(button);
       gradientColors = shuffleArray(colors);
       gradientIndex = 0;
       colorTimer = 0;
@@ -905,29 +1055,12 @@ canvas {
       console.log('Gradient mode activated with colors:', gradientColors);
     }
 
-    function setEraserMode() {
+    function setEraserMode(button) {
       initAudio();
       isEraserMode = true;
       isGradientMode = false;
+      setSelectedButton(button);
       console.log('Eraser mode activated');
-    }
-
-    function addOverlay() {
-      initAudio();
-      overlayCanvas.classList.remove('hidden');
-      document.getElementById('controls').style.display = 'none';
-      document.getElementById('overlayControl').style.display = 'none';
-      document.getElementById('resetBtn').style.display = 'inline-block';
-      document.getElementById('mainResetBtn').style.display = 'none';
-      document.getElementById('cameraBtn').style.display = 'none';
-      octx.fillStyle = 'black';
-      octx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      isScratching = true;
-      
-      if (!isTouchDevice) {
-        document.getElementById('brushCursor').style.display = "none";
-        document.getElementById('scraperCursor').style.display = "block";
-      }
     }
 
     function resetCanvas() {
@@ -937,45 +1070,38 @@ canvas {
       } else {
         createWhiteBackground();
       }
-      octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      overlayCanvas.classList.add('hidden');
-      document.getElementById('controls').style.display = 'flex';
-      document.getElementById('overlayControl').style.display = 'block';
-      document.getElementById('resetBtn').style.display = 'none';
-      document.getElementById('mainResetBtn').style.display = 'inline-block';
-      document.getElementById('cameraBtn').style.display = 'flex';
-      isScratching = false;
-
-      if (!isTouchDevice) {
-        document.getElementById('scraperCursor').style.display = "none";
-        document.getElementById('brushCursor').style.display = "block";
+      
+      if (isAMode) {
+        exitAMode();
       }
     }
 
     function captureCanvas() {
-      // Create a temporary canvas to composite both layers
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       
-      // Set dimensions to match the main canvas
       tempCanvas.width = colorCanvas.width;
       tempCanvas.height = colorCanvas.height;
       
-      // Draw the color canvas (bottom layer)
+      // Always draw the background first
+      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        tempCtx.drawImage(backgroundImage, 0, 0, tempCanvas.width, tempCanvas.height);
+      } else {
+        tempCtx.fillStyle = 'white';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      }
+      // Draw only the colored strokes (transparent where erased)
       tempCtx.drawImage(colorCanvas, 0, 0);
-      
-      // If overlay is visible, draw it on top
-      if (!overlayCanvas.classList.contains('hidden')) {
-        tempCtx.drawImage(overlayCanvas, 0, 0);
+      // Overlay stencil/A mode if active
+      if ((isAMode || isStencilMode) && aOverlay.style.display !== 'none') {
+        tempCtx.drawImage(aOverlay, 0, 0);
       }
       
-      // Convert to blob and download
       tempCanvas.toBlob(function(blob) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         
-        // Generate filename with timestamp
         const now = new Date();
         const timestamp = now.getFullYear() + 
           String(now.getMonth() + 1).padStart(2, '0') + 
@@ -986,9 +1112,7 @@ canvas {
         
         link.download = `drawing_${timestamp}.png`;
         
-        // For iOS Safari compatibility
         if (navigator.userAgent.match(/iPhone|iPad/)) {
-          // On iOS, we need to handle the download differently
           const newWindow = window.open();
           newWindow.document.write(`
             <img src="${url}" style="max-width:100%; height:auto;">
@@ -996,13 +1120,11 @@ canvas {
           `);
           newWindow.document.title = `drawing_${timestamp}.png`;
         } else {
-          // Standard download for other devices
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
         }
         
-        // Clean up the URL object
         setTimeout(() => URL.revokeObjectURL(url), 100);
       }, 'image/png', 1.0);
     }
@@ -1011,17 +1133,17 @@ canvas {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
       const r = pixel[0], g = pixel[1], b = pixel[2], a = pixel[3];
       
-      // If pixel is transparent or white, return null
-      if (a === 0 || (r === 255 && g === 255 && b === 255)) return null;
+      if (a === 0) return null;
       
-      // Check for exact color matches first
+      // Don't erase white background - check if it's close to white
+      if (r > 240 && g > 240 && b > 240) return null;
+      
       if (r === 255 && g === 0 && b === 221) return 'pink';
       if (r === 92 && g === 0 && b === 157) return 'purple';
       if (r === 255 && g === 187 && b === 0) return 'yellow';
       if (r === 255 && g === 77 && b === 0) return 'orange';
       if (r === 125 && g === 244 && b === 255) return 'blue';
       
-      // For gradient colors, find the closest match
       let closestColor = null;
       let minDistance = Infinity;
       
@@ -1037,7 +1159,6 @@ canvas {
         }
       }
       
-      // Only return a color if it's reasonably close (not just random pixels)
       return minDistance < 100 ? closestColor : null;
     }
 
@@ -1046,7 +1167,6 @@ canvas {
       if (note && audioInitialized && synth) {
         try {
           if (isGradientMode) {
-            // For gradient mode, play longer overlapping notes
             synth.triggerAttackRelease(note, "4n");
           } else {
             synth.triggerAttackRelease(note, "8n");
@@ -1070,10 +1190,8 @@ canvas {
       const now = Date.now();
       const elapsed = now - lastColorChangeTime;
       
-      // Calculate transition progress (0 to 1)
       colorTransitionProgress = Math.min(elapsed / colorDuration, 1);
       
-      // If we've completed the transition, move to next color
       if (colorTransitionProgress >= 1) {
         gradientIndex = (gradientIndex + 1) % gradientColors.length;
         currentGradientColor = gradientColors[gradientIndex];
@@ -1081,16 +1199,13 @@ canvas {
         lastColorChangeTime = now;
         colorTransitionProgress = 0;
         
-        // Play overlapping note for the new color in gradient mode
         playNote(currentGradientColor.name);
       }
       
-      // Return interpolated color between current and next
       return interpolateColor(currentGradientColor, nextGradientColor, colorTransitionProgress);
     }
 
     function getColorNameFromRGB(rgbString) {
-      // Parse rgb string to get r, g, b values
       const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
       if (!match) return null;
       
@@ -1098,7 +1213,6 @@ canvas {
       const g = parseInt(match[2]);
       const b = parseInt(match[3]);
       
-      // Find closest color match
       let closestColor = null;
       let minDistance = Infinity;
       
@@ -1118,13 +1232,11 @@ canvas {
     }
 
     function getRandomColorForEraser() {
-      // Return a random color from the palette for eraser audio
       const randomIndex = Math.floor(Math.random() * colors.length);
       return colors[randomIndex].name;
     }
 
     function shouldPlayEraserAudio() {
-      // Play audio more frequently for consistent sound - every 60ms
       const now = Date.now();
       if (now - eraserAudioTimer > 60) {
         eraserAudioTimer = now;
@@ -1134,7 +1246,6 @@ canvas {
     }
 
     function playNoteIfDifferent(colorName, forcePlay = false) {
-      // Play a note if it's different from the last one, or if forced
       const now = Date.now();
       if (colorName && (forcePlay || colorName !== lastPlayedNote || now - eraserAudioTimer > noteChangeThreshold)) {
         playNote(colorName);
@@ -1145,11 +1256,9 @@ canvas {
     }
 
     function getDetailedColorSample(x, y, radius = 8) {
-      // More intensive sampling for gradient detection
       const samples = [];
-      const step = 2; // Sample every 2 pixels for detailed coverage
+      const step = 2;
       
-      // Sample in a circular pattern around the point
       for (let angle = 0; angle < 360; angle += 45) {
         const rad = (angle * Math.PI) / 180;
         const px = Math.round(x + Math.cos(rad) * radius);
@@ -1161,7 +1270,6 @@ canvas {
         }
       }
       
-      // Also sample the center and immediate neighbors
       const centerSamples = [
         [x, y], [x-1, y], [x+1, y], [x, y-1], [x, y+1]
       ];
@@ -1175,7 +1283,6 @@ canvas {
       
       if (samples.length === 0) return null;
       
-      // Return the most frequently occurring color
       const colorCounts = {};
       samples.forEach(color => {
         colorCounts[color] = (colorCounts[color] || 0) + 1;
@@ -1187,13 +1294,11 @@ canvas {
     }
 
     function maintainEraserAudio() {
-      // Continuous audio maintenance for eraser - plays even when not moving much
       if (isEraserMode && painting && eraserMoving) {
         const lastPoint = eraserPath[eraserPath.length - 1];
         if (lastPoint) {
           const colorName = getDetailedColorSample(lastPoint.x, lastPoint.y);
           if (colorName) {
-            // Play note if we haven't played one recently or if color changed
             const now = Date.now();
             if (now - eraserAudioTimer > 80 || colorName !== lastPlayedNote) {
               playNoteIfDifferent(colorName);
@@ -1206,77 +1311,124 @@ canvas {
 
     function draw(x, y) {
       if (!painting) return;
-
-      if (!isScratching) {
-        if (isEraserMode) {
-          // Add current position to eraser path
-          eraserPath.push({x, y, timestamp: Date.now()});
-          // Keep only recent path points (last 10 points)
-          if (eraserPath.length > 10) {
-            eraserPath.shift();
+      // If stencil mode is active, only allow drawing inside the transparent area
+      if (isStencilMode) {
+        // Check if pixel is inside the letter/digit area by sampling overlay alpha
+        const overlayPixel = aCtx.getImageData(x, y, 1, 1).data;
+        // If overlay is transparent (alpha == 0), allow drawing
+        if (overlayPixel[3] === 0) {
+          if (isEraserMode) {
+            eraserPath.push({x, y, timestamp: Date.now()});
+            if (eraserPath.length > 10) {
+              eraserPath.shift();
+            }
+            eraserMoving = true;
+            const colorName = getDetailedColorSample(x, y, brushSize / 3);
+            if (colorName) {
+              const now = Date.now();
+              const timeSinceLastNote = now - eraserAudioTimer;
+              if (colorName !== lastPlayedNote || timeSinceLastNote > 60) {
+                playNoteIfDifferent(colorName, timeSinceLastNote > 120);
+              }
+            }
+            const imageData = ctx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              const a = data[i + 3];
+              if (!(r > 240 && g > 240 && b > 240)) {
+                const pixelIndex = i / 4;
+                const pixelX = (pixelIndex % brushSize) - brushSize/2;
+                const pixelY = Math.floor(pixelIndex / brushSize) - brushSize/2;
+                const distance = Math.sqrt(pixelX * pixelX + pixelY * pixelY);
+                if (distance <= brushSize/2) {
+                  data[i + 3] = 0;
+                }
+              }
+            }
+            ctx.putImageData(imageData, x - brushSize/2, y - brushSize/2);
+          } else if (isGradientMode) {
+            const gradientColor = updateGradientColor();
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = gradientColor;
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = "round";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = "round";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            const colorName = getColorNameFromRGB(currentColor);
+            if (colorName) playNote(colorName);
           }
-          
-          eraserMoving = true;
-          
-          // Enhanced eraser mode - continuous detailed color sampling
-          const colorName = getDetailedColorSample(x, y, brushSize / 3);
-          
-          if (colorName) {
-            // Always try to play audio for eraser to maintain consistency
-            const now = Date.now();
-            const timeSinceLastNote = now - eraserAudioTimer;
-            
-            // Play if it's a new color or if enough time has passed for continuity
-            if (colorName !== lastPlayedNote || timeSinceLastNote > 60) {
-              playNoteIfDifferent(colorName, timeSinceLastNote > 120); // Force play if too much time passed
+        }
+        // If not in transparent area, do nothing
+        return;
+      }
+      // ...existing code for normal draw...
+      if (isEraserMode) {
+        eraserPath.push({x, y, timestamp: Date.now()});
+        if (eraserPath.length > 10) {
+          eraserPath.shift();
+        }
+        eraserMoving = true;
+        const colorName = getDetailedColorSample(x, y, brushSize / 3);
+        if (colorName) {
+          const now = Date.now();
+          const timeSinceLastNote = now - eraserAudioTimer;
+          if (colorName !== lastPlayedNote || timeSinceLastNote > 60) {
+            playNoteIfDifferent(colorName, timeSinceLastNote > 120);
+          }
+        }
+        const imageData = ctx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+          // Only erase colored brush strokes, not white or background
+          // If pixel is close to white, skip
+          if (!(r > 240 && g > 240 && b > 240)) {
+            // If pixel is not white and not fully background, erase it
+            // This will erase gradients and blends too
+            const pixelIndex = i / 4;
+            const pixelX = (pixelIndex % brushSize) - brushSize/2;
+            const pixelY = Math.floor(pixelIndex / brushSize) - brushSize/2;
+            const distance = Math.sqrt(pixelX * pixelX + pixelY * pixelY);
+            if (distance <= brushSize/2) {
+              data[i + 3] = 0;
             }
           }
-          
-          ctx.save();
-          ctx.globalCompositeOperation = 'destination-out';
-          ctx.beginPath();
-          ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2, false);
-          ctx.fill();
-          ctx.restore();
-        } else if (isGradientMode) {
-          // Gradient mode - use smooth color transitions with synchronized audio
-          const gradientColor = updateGradientColor();
-          
-          ctx.lineTo(x, y);
-          ctx.strokeStyle = gradientColor;
-          ctx.lineWidth = brushSize;
-          ctx.lineCap = "round";
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-        } else {
-          // Normal drawing mode
-          ctx.lineTo(x, y);
-          ctx.strokeStyle = currentColor;
-          ctx.lineWidth = brushSize;
-          ctx.lineCap = "round";
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          
-          // Play note for current color
-          const colorName = getColorNameFromRGB(currentColor);
-          if (colorName) playNote(colorName);
         }
+        ctx.putImageData(imageData, x - brushSize/2, y - brushSize/2);
+      } else if (isGradientMode) {
+        const gradientColor = updateGradientColor();
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = gradientColor;
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
       } else {
-        // Scratching mode - improved for gradient detection
-        octx.save();
-        octx.globalCompositeOperation = 'destination-out';
-        octx.beginPath();
-        octx.arc(x, y, 25, 0, Math.PI * 2, false);
-        octx.fill();
-        octx.restore();
-
-        // Use detailed color sampling for scraper too
-        const colorName = getDetailedColorSample(x, y, 15);
-        if (colorName) {
-          playNoteIfDifferent(colorName);
-        }
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        const colorName = getColorNameFromRGB(currentColor);
+        if (colorName) playNote(colorName);
       }
     }
 
@@ -1292,7 +1444,6 @@ canvas {
         y = e.clientY - rect.top;
       }
       
-      // Scale coordinates to match canvas resolution
       x = x * (colorCanvas.width / rect.width);
       y = y * (colorCanvas.height / rect.height);
       
@@ -1304,7 +1455,6 @@ canvas {
       initAudio();
       painting = true;
       
-      // Reset note tracking and eraser state when starting a new stroke
       lastPlayedNote = null;
       eraserAudioTimer = 0;
       eraserMoving = false;
@@ -1314,15 +1464,13 @@ canvas {
       ctx.beginPath();
       ctx.moveTo(coords.x, coords.y);
       
-      // If in gradient mode, reset color timing when starting new stroke
       if (isGradientMode) {
-        gradientColors = shuffleArray(colors); // Re-randomize for each stroke
+        gradientColors = shuffleArray(colors);
         gradientIndex = 0;
         lastColorChangeTime = Date.now();
         currentGradientColor = gradientColors[0];
         nextGradientColor = gradientColors[1];
         colorTransitionProgress = 0;
-        // Play initial overlapping note immediately
         if (audioInitialized && synth) {
           try {
             synth.triggerAttackRelease(colorNotes[currentGradientColor.name], "2n");
@@ -1350,80 +1498,129 @@ canvas {
       draw(coords.x, coords.y);
     }
 
-    // Add event listeners for color buttons
-    document.querySelectorAll('.btn[data-color]').forEach(button => {
+    // Dropdown functionality
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    let isDropdownOpen = false;
+
+    function toggleDropdown() {
+      isDropdownOpen = !isDropdownOpen;
+      if (isDropdownOpen) {
+        dropdownMenu.classList.add('open');
+        dropdownToggle.textContent = '✕';
+        dropdownToggle.classList.add('selected');
+      } else {
+        dropdownMenu.classList.remove('open');
+        dropdownToggle.textContent = '☰';
+        dropdownToggle.classList.remove('selected');
+      }
+    }
+
+    dropdownToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    dropdownToggle.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    // Color button event listeners
+    document.querySelectorAll('.dropdown-item[data-color]').forEach(button => {
       button.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         const color = this.getAttribute('data-color');
-        setColor(color);
+        setColor(color, this);
       });
       
-      // Also add touch events for better iOS support
       button.addEventListener('touchend', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         const color = this.getAttribute('data-color');
-        setColor(color);
+        setColor(color, this);
       });
     });
 
-    // Add event listeners for gradient button
+    // Gradient button
     document.getElementById('gradientBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      setGradientMode();
+      e.stopPropagation();
+      setGradientMode(this);
     });
 
     document.getElementById('gradientBtn').addEventListener('touchend', function(e) {
       e.preventDefault();
-      setGradientMode();
+      e.stopPropagation();
+      setGradientMode(this);
     });
 
-    // Add event listeners for eraser button
+    // Eraser button
     document.getElementById('eraserBtn').addEventListener('click', function(e) {
       e.preventDefault();
-      setEraserMode();
+      e.stopPropagation();
+      setEraserMode(this);
     });
 
     document.getElementById('eraserBtn').addEventListener('touchend', function(e) {
       e.preventDefault();
-      setEraserMode();
+      e.stopPropagation();
+      setEraserMode(this);
     });
 
-    // Add event listeners for brush size slider
+    // A/a button
+    document.getElementById('aBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'flex';
+    });
+
+    document.getElementById('aBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'flex';
+    });
+
+    // Close letter grid
+    document.getElementById('closeLetterGrid').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'none';
+    });
+
+    // A Cancel button
+    document.getElementById('aCancelBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      exitAMode();
+    });
+
+    document.getElementById('aCancelBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      exitAMode();
+    });
+
+    // Brush size slider
     const brushSizeSlider = document.getElementById('brushSizeSlider');
     const brushSizeLabel = document.getElementById('brushSizeLabel');
     
     brushSizeSlider.addEventListener('input', function(e) {
+      e.stopPropagation();
       brushSize = parseInt(e.target.value);
       brushSizeLabel.textContent = brushSize + 'px';
     });
 
     brushSizeSlider.addEventListener('change', function(e) {
+      e.stopPropagation();
       brushSize = parseInt(e.target.value);
       brushSizeLabel.textContent = brushSize + 'px';
     });
 
-    // Add event listeners for overlay button
-    document.getElementById('overlayBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      addOverlay();
-    });
-
-    document.getElementById('overlayBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      addOverlay();
-    });
-
-    // Add event listeners for reset buttons
-    document.getElementById('resetBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      resetCanvas();
-    });
-
-    document.getElementById('resetBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      resetCanvas();
-    });
-
+    // Reset button
     document.getElementById('mainResetBtn').addEventListener('click', function(e) {
       e.preventDefault();
       resetCanvas();
@@ -1434,7 +1631,7 @@ canvas {
       resetCanvas();
     });
 
-    // Add event listeners for camera button
+    // Camera button
     document.getElementById('cameraBtn').addEventListener('click', function(e) {
       e.preventDefault();
       captureCanvas();
@@ -1447,43 +1644,13 @@ canvas {
 
     // Canvas drawing events
     if (isTouchDevice) {
-      // Touch events for mobile/tablet
       colorCanvas.addEventListener('touchstart', startDraw, { passive: false });
       colorCanvas.addEventListener('touchend', endDraw, { passive: false });
       colorCanvas.addEventListener('touchmove', moveDraw, { passive: false });
-      
-      overlayCanvas.addEventListener('touchstart', startDraw, { passive: false });
-      overlayCanvas.addEventListener('touchend', endDraw, { passive: false });
-      overlayCanvas.addEventListener('touchmove', moveDraw, { passive: false });
     } else {
-      // Mouse events for desktop
       colorCanvas.addEventListener('mousedown', startDraw);
       colorCanvas.addEventListener('mouseup', endDraw);
       colorCanvas.addEventListener('mousemove', moveDraw);
-      
-      overlayCanvas.addEventListener('mousedown', startDraw);
-      overlayCanvas.addEventListener('mouseup', endDraw);
-      overlayCanvas.addEventListener('mousemove', moveDraw);
-    }
-
-    const brushCursor = document.getElementById("brushCursor");
-    const scraperCursor = document.getElementById("scraperCursor");
-
-    // Mouse cursor tracking (desktop only)
-    if (!isTouchDevice) {
-      document.addEventListener("mousemove", (e) => {
-        if (isScratching) {
-          brushCursor.style.display = "none";
-          scraperCursor.style.display = "block";
-          scraperCursor.style.left = `${e.clientX - 30}px`;
-          scraperCursor.style.top = `${e.clientY - 30}px`;
-        } else {
-          scraperCursor.style.display = "none";
-          brushCursor.style.display = "block";
-          brushCursor.style.left = `${e.clientX - 30}px`;
-          brushCursor.style.top = `${e.clientY - 30}px`;
-        }
-      });
     }
 
     // Ensure audio context is started on any user interaction
@@ -1491,7 +1658,10 @@ canvas {
     document.addEventListener('click', initAudio, { once: true });
 
     // Continuous audio maintenance for eraser
-    setInterval(maintainEraserAudio, 50); // Check every 50ms for continuous audio
+    setInterval(maintainEraserAudio, 50);
+
+    // Set initial color selection
+    setColor('rgb(255, 0, 221)', document.querySelector('.dropdown-item.pink'));
   </script>
 </body>
 </html>
