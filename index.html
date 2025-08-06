@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Draw with music!</title>
+  <link rel="stylesheet" href="https://use.typekit.net/xvl8ddx.css">
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
   <style>
 @media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (max-width: 1024px) and (orientation: landscape) {
@@ -12,13 +13,15 @@
     height: 100vh !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
-    font-family: "Comic Sans MS", "Comic Sans" !important;
+    font-family: "CLT Apfel Grotezk", sans-serif !important;
   }
   #title, #prompt {
-    font-family: "Comic Sans MS", "Comic Sans" !important;
+    font-family: "CLT Apfel Grotezk", sans-serif !important;
   }
   #letterGrid, .letter-item {
-    font-family: "Comic Sans MS", "Comic Sans" !important;
+    font-family: "comic-sans-ms", sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
   }
 }
 /* Overlay cross button for stencil mode */
@@ -87,7 +90,7 @@ html, body {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
-  font-family: "Comic Sans MS", "Comic Sans" !important;
+  font-family: "CLT Apfel Grotezk", sans-serif !important;
   background: url('white-wall.jpg') no-repeat center center fixed;
   background-size: cover;
   touch-action: none;
@@ -240,7 +243,7 @@ canvas {
   justify-content: center;
   font-size: clamp(0.7rem, 1.2vw, 1rem);
   color: white;
-  font-family: "Comic Sans MS", "Comic Sans" !important;
+  font-family: "CLT Apfel Grotezk", sans-serif !important;
   font-weight: bold;
   transform: none;
 }
@@ -335,7 +338,9 @@ canvas {
   transition: all 0.3s ease;
   background: white;
   color: #333;
-  font-family: "Comic Sans MS", "Comic Sans" !important;
+  font-family: "comic-sans-ms", sans-serif !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
 }
 
 .letter-item:hover {
@@ -759,7 +764,8 @@ canvas {
       // Calculate font size and position
       let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
       if (char.length > 1) fontSize *= 0.7;
-      aCtx.font = `bold ${fontSize}px "Comic Sans MS", "Comic Sans"`;
+      aCtx.font = `400 ${fontSize}px "comic-sans-ms", sans-serif`;
+      aCtx.fontStyle = 'normal';
       aCtx.textAlign = 'center';
       aCtx.textBaseline = 'middle';
       aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
@@ -883,7 +889,8 @@ canvas {
         
         // Create the selected letter/number
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 600px "Comic Sans MS", "Comic Sans"';
+        ctx.font = '400 600px "comic-sans-ms", sans-serif';
+        ctx.fontStyle = 'normal';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
