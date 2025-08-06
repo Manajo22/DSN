@@ -6,6 +6,21 @@
   <title>Draw with music!</title>
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
   <style>
+@media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (max-width: 1024px) and (orientation: landscape) {
+  html, body, canvas, #aOverlay {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+  }
+  #title, #prompt {
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+  }
+  #letterGrid, .letter-item {
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+  }
+}
 /* Overlay cross button for stencil mode */
 #stencilCloseBtn {
   position: fixed;
@@ -58,6 +73,12 @@
     @font-face {
       font-family: "CLT Apfel Grotezk";
       src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Comic Sans MS";
+      src: local("Comic Sans MS"), local("Comic Sans"), url("https://fonts.cdnfonts.com/s/14617/Comic_Sans_MS.woff") format("woff");
+      font-style: normal;
+      font-weight: normal;
     }
 
     html, body {
@@ -737,7 +758,7 @@ canvas {
       // Calculate font size and position
       let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
       if (char.length > 1) fontSize *= 0.7;
-      aCtx.font = `bold ${fontSize}px "Comic Sans MS", cursive`;
+      aCtx.font = `bold ${fontSize}px "Comic Sans MS", "Comic Sans", cursive, sans-serif`;
       aCtx.textAlign = 'center';
       aCtx.textBaseline = 'middle';
       aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
@@ -861,7 +882,7 @@ canvas {
         
         // Create the selected letter/number
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 600px "Comic Sans MS", cursive';
+        ctx.font = 'bold 600px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
