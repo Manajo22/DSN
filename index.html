@@ -12,13 +12,13 @@
     height: 100vh !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
-    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+    font-family: "Comic Sans MS", "Comic Sans" !important;
   }
   #title, #prompt {
-    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+    font-family: "Comic Sans MS", "Comic Sans" !important;
   }
   #letterGrid, .letter-item {
-    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif !important;
+    font-family: "Comic Sans MS", "Comic Sans" !important;
   }
 }
 /* Overlay cross button for stencil mode */
@@ -76,24 +76,24 @@
     }
     @font-face {
       font-family: "Comic Sans MS";
-      src: local("Comic Sans MS"), local("Comic Sans"), url("https://fonts.cdnfonts.com/s/14617/Comic_Sans_MS.woff") format("woff");
+      src: url("data:font/woff;base64,d09GRgABAAAAAAw0ABAAAAAAQ8gAA...TRUNCATED_BASE64...AA==") format("woff"), local("Comic Sans MS"), local("Comic Sans"), url("https://fonts.cdnfonts.com/s/14617/Comic_Sans_MS.woff") format("woff");
       font-style: normal;
       font-weight: normal;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-      font-family: "CLT Apfel Grotezk", sans-serif;
-      background: url('white-wall.jpg') no-repeat center center fixed;
-      background-size: cover;
-      touch-action: none;
-      -webkit-tap-highlight-color: transparent;
-      overscroll-behavior: none;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Comic Sans MS", "Comic Sans" !important;
+  background: url('white-wall.jpg') no-repeat center center fixed;
+  background-size: cover;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
 
 #title {
   position: fixed;
@@ -240,7 +240,7 @@ canvas {
   justify-content: center;
   font-size: clamp(0.7rem, 1.2vw, 1rem);
   color: white;
-  font-family: "CLT Apfel Grotezk", sans-serif;
+  font-family: "Comic Sans MS", "Comic Sans" !important;
   font-weight: bold;
   transform: none;
 }
@@ -335,6 +335,7 @@ canvas {
   transition: all 0.3s ease;
   background: white;
   color: #333;
+  font-family: "Comic Sans MS", "Comic Sans" !important;
 }
 
 .letter-item:hover {
@@ -758,7 +759,7 @@ canvas {
       // Calculate font size and position
       let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
       if (char.length > 1) fontSize *= 0.7;
-      aCtx.font = `bold ${fontSize}px "Comic Sans MS", "Comic Sans", cursive, sans-serif`;
+      aCtx.font = `bold ${fontSize}px "Comic Sans MS", "Comic Sans"`;
       aCtx.textAlign = 'center';
       aCtx.textBaseline = 'middle';
       aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
@@ -882,7 +883,7 @@ canvas {
         
         // Create the selected letter/number
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 600px "Comic Sans MS", "Comic Sans", cursive, sans-serif';
+        ctx.font = 'bold 600px "Comic Sans MS", "Comic Sans"';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
