@@ -1,12 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gujaratilexicon/fonts@master/fonts/gopika/Gopika.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Draw with music!</title>
   <link rel="stylesheet" href="https://use.typekit.net/xvl8ddx.css">
   <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
   <style>
+/* Unify stencil button size and spacing for shapes grid */
+.shapes-item {
+  width: clamp(60px, 10vw, 80px) !important;
+  height: clamp(60px, 10vw, 80px) !important;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.shapes-item:hover {
+  border-color: #ffb700;
+}
+
+#shapesGrid {
+  gap: 15px !important;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  align-items: center;
+}
+  @font-face {
+    font-family: 'Gopika';
+    src: url('https://cdn.jsdelivr.net/gh/gujaratilexicon/fonts@master/fonts/gopika/Gopika.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+/* Gujarati button styles */
+.gujarati-button {
+  background-color: #000;
+  color: #fff;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-family: 'Gopika', 'Noto Sans Gujarati', sans-serif !important;
+  border-radius: 50%;
+  border: 2px solid #666;
+  width: clamp(50px, 8vw, 70px);
+  height: clamp(50px, 8vw, 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.gujarati-button:hover {
+  background-color: #222;
+  border-color: #ffb700;
+}
+
+#gujaratiGridModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000 !important;
+}
+#gujaratiGrid {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+}
+.gujarati-item {
+  width: clamp(60px, 8vw, 80px);
+  height: clamp(60px, 8vw, 80px);
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  color: #222;
+  font-family: 'Gopika', 'Noto Sans Gujarati', sans-serif !important;
+}
+.gujarati-item:hover {
+  transform: scale(1.1);
+  border-color: #ffb700;
+  background: #fff7e0;
+}
+#closeGujaratiGrid {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #ffb700;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 @media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (max-width: 1024px) and (orientation: landscape) {
   html, body, canvas, #aOverlay {
     width: 100vw !important;
@@ -32,8 +151,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #000 0%, #000 49%, #fff 49%, #fff 51%, #000 51%);
-  border: 3px solid #fff;
+  background: #222;
+  border: 2px solid #fff;
   color: white;
   font-size: 2rem;
   cursor: pointer;
@@ -52,9 +171,9 @@
   top: 50%;
   left: 50%;
   width: 24px;
-  height: 4px;
+  height: 2px;
   background: white;
-  border-radius: 2px;
+  border-radius: 1px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
 #stencilCloseBtn:after {
@@ -63,9 +182,9 @@
   top: 50%;
   left: 50%;
   width: 24px;
-  height: 4px;
+  height: 2px;
   background: white;
-  border-radius: 2px;
+  border-radius: 1px;
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
@@ -200,7 +319,7 @@ canvas {
 }
 
 #dropdownToggle.selected {
-  box-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #fff;
+  box-shadow: none;
 }
 
 #dropdownMenu {
@@ -214,7 +333,7 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 #dropdownMenu.open {
@@ -225,6 +344,7 @@ canvas {
 
 .dropdown-row {
   display: flex;
+  flex-direction: row;
   gap: 15px;
   align-items: center;
 }
@@ -253,8 +373,27 @@ canvas {
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+/* Only solid yellow border for hovered and selected buttons, no yellow glow */
+.dropdown-item.selected,
+#dropdownToggle.selected,
+.gujarati-button.selected,
+.dropdown-item:hover,
+#dropdownToggle:hover,
+.gujarati-button:hover {
+  border: 3px solid #ffb700 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
 .dropdown-item.selected {
-  box-shadow: 0 0 15px #fff, 0 0 25px #fff, 0 0 35px #fff;
+  box-shadow: none;
+}
+
+/* Add yellow outline and glow for selected buttons */
+.dropdown-item.selected,
+#dropdownToggle.selected,
+.gujarati-button.selected {
+  border: 3px solid #ffb700 !important;
+  box-shadow: 0 0 15px #ffb700, 0 0 25px #ffb700, 0 0 35px #ffb700 !important;
 }
 
 #brushSizeContainer {
@@ -309,7 +448,7 @@ canvas {
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 25;
+  z-index: 1000 !important;
 }
 
 #letterGrid {
@@ -522,6 +661,23 @@ canvas {
   display: none;
 }
 
+/* Prevent text selection for all options and buttons */
+.dropdown-item,
+#dropdownToggle,
+.gujarati-button,
+.letter-item,
+.gujarati-item,
+#aCancelBtn,
+#mainResetBtn,
+#cameraBtn,
+#stencilCloseBtn,
+#closeLetterGrid,
+#closeGujaratiGrid {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 /* Responsive positioning for dropdown items */
 @media (max-width: 900px) {
   #circularDropdown {
@@ -697,7 +853,11 @@ canvas {
       <!-- Tools row -->
       <div class="dropdown-row">
         <button class="dropdown-item gradient" id="gradientBtn">🌈</button>
-        <button class="dropdown-item eraser" id="eraserBtn">⚪</button>
+        <button class="dropdown-item eraser" id="eraserBtn" style="padding:0;display:flex;align-items:center;justify-content:center;">
+          <span style="display:inline-block;width:22px;height:22px;background:#000;border-radius:3px;position:relative;">
+            <span style="display:block;position:absolute;left:8px;top:2px;width:6px;height:18px;background:#fff;border-radius:2px;"></span>
+          </span>
+        </button>
         
         <!-- Brush size container positioned to the right -->
         <div id="brushSizeContainer">
@@ -709,6 +869,11 @@ canvas {
     
     <!-- A/a button positioned to the right of dropdown toggle -->
     <button class="dropdown-item a-button" id="aBtn" style="position: absolute; top: 0; left: calc(100% + 20px);">A/a</button>
+    <button class="gujarati-button" id="gujaratiBtn" style="position: absolute; top: 0; left: calc(100% + 100px);">ક</button>
+    <!-- Add Shapes button next to Gujarati button -->
+    <button class="dropdown-item shapes-button" id="shapesBtn" style="position: absolute; top: 0; left: calc(100% + 180px);">
+      <span style="display:inline-block;width:1.5em;height:1.5em;border-radius:50%;background:#222;border:2px solid #fff;"></span>
+    </button>
   </div>
 
   <!-- Letter Grid Modal -->
@@ -717,18 +882,143 @@ canvas {
       <button id="closeLetterGrid">✕</button>
     </div>
   </div>
+  <!-- Gujarati Grid Modal -->
+  <div id="gujaratiGridModal">
+    <div id="gujaratiGrid">
+      <button id="closeGujaratiGrid">✕</button>
+    </div>
+  </div>
+
+  <!-- Shapes Grid Modal -->
+  <div id="shapesGridModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:1000;">
+    <div id="shapesGrid" style="background:white;border-radius:22px;padding:18px 8px 8px 8px;max-width:96vw;max-height:80vh;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;">
+      <button id="closeShapesGrid" style="position:absolute;top:10px;right:10px;width:40px;height:40px;border:none;background:#ffb700;color:white;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      <!-- Shape buttons will be injected here -->
+    </div>
+  </div>
 
   <!-- A Mode Cancel Button -->
   <button id="aCancelBtn">✕</button>
 
-  <button id="mainResetBtn">Reset</button>
-  <button id="cameraBtn">📷 Save</button>
+  <button id="mainResetBtn" style="font-size:1.1rem;width:90px;height:44px;border-radius:15px;margin:12px;background:linear-gradient(90deg,#ff179e,#9855fe,#45a0fc);color:black;border:none;display:flex;align-items:center;justify-content:center;">Reset</button>
+  <button id="cameraBtn" style="font-size:1.1rem;width:90px;height:44px;border-radius:15px;margin:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;display:flex;align-items:center;justify-content:center;">Save</button>
   <canvas id="colorCanvas"></canvas>
   <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
   <canvas id="aOverlay"></canvas>
-  <button id="stencilCloseBtn">✕</button>
+  <button id="stencilCloseBtn"></button>
 
   <script>
+    // Gujarati letters, vowels, numerals
+    const gujaratiConsonants = [
+      'ક','ખ','ગ','ઘ','ઙ','ચ','છ','જ','ઝ','ઞ','ટ','ઠ',
+      'ડ','ઢ','ણ','ત','થ','દ','ધ','ન','પ','ફ','બ','ભ',
+      'મ','ય','ર','લ','વ','શ','ષ','સ','હ','ળ','ક્ષ','ત્ર'
+    ];
+    const gujaratiVowels = ['અ','આ','ઇ','ઈ','ઉ','ઊ','એ','ઐ','ઓ','ઔ','અં','અઃ'];
+    const gujaratiNumerals = ['૦','૧','૨','૩','૪','૫','૬','૭','૮','૯'];
+
+    // Show Gujarati grid modal (only one grid open at a time)
+    document.getElementById('gujaratiBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'none';
+      createGujaratiGrid();
+      document.getElementById('gujaratiGridModal').style.display = 'flex';
+    });
+    document.getElementById('gujaratiBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'none';
+      createGujaratiGrid();
+      document.getElementById('gujaratiGridModal').style.display = 'flex';
+    });
+
+    // Show A/a grid modal (only one grid open at a time)
+    document.getElementById('aBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+      document.getElementById('letterGridModal').style.display = 'flex';
+    });
+    document.getElementById('aBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+      document.getElementById('letterGridModal').style.display = 'flex';
+    });
+
+    // Close Gujarati grid
+    document.getElementById('closeGujaratiGrid').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+    });
+
+    // Create Gujarati grid
+    function createGujaratiGrid() {
+      const gujaratiGrid = document.getElementById('gujaratiGrid');
+      const closeBtn = document.getElementById('closeGujaratiGrid');
+      gujaratiGrid.innerHTML = '';
+      gujaratiGrid.appendChild(closeBtn);
+      // Consonants
+      gujaratiConsonants.forEach(char => {
+        const item = document.createElement('button');
+        item.className = 'gujarati-item';
+        item.textContent = char;
+        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+        gujaratiGrid.appendChild(item);
+      });
+      // Vowels
+      gujaratiVowels.forEach(char => {
+        const item = document.createElement('button');
+        item.className = 'gujarati-item';
+        item.textContent = char;
+        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+        gujaratiGrid.appendChild(item);
+      });
+      // Numerals
+      gujaratiNumerals.forEach(char => {
+        const item = document.createElement('button');
+        item.className = 'gujarati-item';
+        item.textContent = char;
+        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+        gujaratiGrid.appendChild(item);
+      });
+    }
+
+    // Show Gujarati stencil overlay
+    function showGujaratiStencilOverlay(char) {
+      isStencilMode = true;
+      selectedLetter = char;
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+      drawGujaratiStencilOverlay(char);
+      stencilCloseBtn.style.display = 'flex';
+      aOverlay.style.display = 'block';
+      document.getElementById('circularDropdown').style.zIndex = 40;
+      document.getElementById('mainResetBtn').style.zIndex = 40;
+      document.getElementById('cameraBtn').style.zIndex = 40;
+      document.getElementById('title').style.zIndex = 40;
+      document.getElementById('prompt').style.zIndex = 40;
+    }
+
+    // Draw Gujarati stencil overlay
+    function drawGujaratiStencilOverlay(char) {
+      aOverlay.width = window.innerWidth;
+      aOverlay.height = window.innerHeight;
+      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+      aCtx.globalAlpha = 1.0;
+      aCtx.fillStyle = 'black';
+      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+      aCtx.save();
+      aCtx.globalCompositeOperation = 'destination-out';
+      let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
+      aCtx.font = `${fontSize}px 'Gopika', 'Noto Sans Gujarati', sans-serif`;
+      aCtx.textAlign = 'center';
+      aCtx.textBaseline = 'middle';
+      aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
+      aCtx.restore();
+      aCtx.globalCompositeOperation = 'source-over';
+    }
     // --- Digital Stencil Feature ---
     let isStencilMode = false;
     const stencilCloseBtn = document.getElementById('stencilCloseBtn');
@@ -1155,6 +1445,17 @@ canvas {
         setTimeout(() => URL.revokeObjectURL(url), 100);
       }, 'image/png', 1.0);
     }
+
+    document.getElementById('cameraBtn').onclick = function() {
+  var canvas = document.getElementById('colorCanvas');
+  var dataURL = canvas.toDataURL('image/png');
+  var a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'drawing.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 
     function getColorAtPixel(x, y) {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
@@ -1684,11 +1985,233 @@ canvas {
     document.addEventListener('touchstart', initAudio, { once: true });
     document.addEventListener('click', initAudio, { once: true });
 
+   
+
     // Continuous audio maintenance for eraser
     setInterval(maintainEraserAudio, 50);
 
     // Set initial color selection
     setColor('rgb(255, 0, 221)', document.querySelector('.dropdown-item.pink'));
+
+    const shapesList = [
+  {name:'Horizontal Line',svg:'<svg width="40" height="40"><line x1="5" y1="20" x2="35" y2="20" stroke="#222" stroke-width="4"/></svg>'},
+  {name:'Vertical Line',svg:'<svg width="40" height="40"><line x1="20" y1="5" x2="20" y2="35" stroke="#222" stroke-width="4"/></svg>'},
+  {name:'Slanting Line',svg:'<svg width="40" height="40"><line x1="8" y1="32" x2="32" y2="8" stroke="#222" stroke-width="4"/></svg>'},
+  {name:'Square',svg:'<svg width="40" height="40"><rect x="8" y="8" width="24" height="24" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Rectangle',svg:'<svg width="40" height="40"><rect x="5" y="12" width="30" height="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Circle',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Triangle',svg:'<svg width="40" height="40"><polygon points="20,6 34,34 6,34" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Semicircle',svg:'<svg width="40" height="40"><path d="M8,32 A12,12 0 0,1 32,32" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Trapezoid',svg:'<svg width="40" height="40"><polygon points="10,34 30,34 34,14 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Pentagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,16 28,34 12,34 6,16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Hexagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,14 34,26 20,34 6,26 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Octagon',svg:'<svg width="40" height="40"><polygon points="12,6 28,6 34,12 34,28 28,34 12,34 6,28 6,12" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+  {name:'Star',svg:'<svg width="40" height="40"><polygon points="20,6 24,16 34,16 26,22 30,32 20,26 10,32 14,22 6,16 16,16" stroke="#222" stroke-width="3" fill="none"/></svg>'},
+  {name:'Heart',svg:'<svg width="40" height="40"><path d="M20,36 C-8,12 8,-8 20,8 C32,-8 48,12 20,36 Z" stroke="#222" stroke-width="3" fill="none"/></svg>'},
+  {name:'Smiley',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="14" stroke="#222" stroke-width="3" fill="none"/><circle cx="15" cy="17" r="2" fill="#222"/><circle cx="25" cy="17" r="2" fill="#222"/><path d="M14,25 Q20,30 26,25" stroke="#222" stroke-width="2" fill="none"/></svg>'},
+  {name:'Sun',svg:'<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="10" stroke="#222" stroke-width="3" fill="none"/><g stroke="#222" stroke-width="3"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/><line x1="7" y1="7" x2="13" y2="13"/><line x1="27" y1="27" x2="33" y2="33"/><line x1="7" y1="33" x2="13" y2="27"/><line x1="27" y1="13" x2="33" y2="7"/></g></svg>'},
+  {name:'Fish',svg:'<svg width="40" height="40" viewBox="-60 -40 160 80"><g><path d="M-60,0 Q0,-56 60,0 Q0,56 -60,0 Z" stroke="#222" stroke-width="8" fill="none"/><polygon points="60,0 100,-30 100,30" stroke="#222" stroke-width="8" fill="none"/><circle cx="-36" cy="0" r="4" fill="#222"/></g></svg>'}
+];
+
+function createShapesGrid() {
+  const shapesGrid = document.getElementById('shapesGrid');
+  const closeBtn = document.getElementById('closeShapesGrid');
+  shapesGrid.innerHTML = '';
+  shapesGrid.appendChild(closeBtn);
+  shapesList.forEach(shape => {
+    const item = document.createElement('button');
+    item.className = 'shapes-item';
+    item.title = shape.name;
+    item.innerHTML = shape.svg;
+    item.style.width = '64px';
+    item.style.height = '64px';
+    item.style.background = 'white';
+    item.style.border = '2px solid #ccc';
+    item.style.borderRadius = '50%';
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.justifyContent = 'center';
+    item.style.cursor = 'pointer';
+    item.style.transition = 'all 0.3s ease';
+    item.style.margin = '12px';
+    item.style.padding = '0';
+    item.style.userSelect = 'none';
+    item.style.fontSize = '1.2rem';
+    item.onmouseover = () => { item.style.borderColor = '#ffb700'; };
+    item.onmouseout = () => { item.style.borderColor = '#ccc'; };
+    item.onclick = () => showShapeStencilOverlay(shape.name);
+    shapesGrid.appendChild(item);
+  });
+}
+
+// Show shapes grid modal
+const shapesBtn = document.getElementById('shapesBtn');
+shapesBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('letterGridModal').style.display = 'none';
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+  createShapesGrid();
+  document.getElementById('shapesGridModal').style.display = 'flex';
+});
+shapesBtn.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('letterGridModal').style.display = 'none';
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+  createShapesGrid();
+  document.getElementById('shapesGridModal').style.display = 'flex';
+});
+// Close shapes grid
+const closeShapesGrid = document.getElementById('closeShapesGrid');
+closeShapesGrid.addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('shapesGridModal').style.display = 'none';
+});
+
+    function showShapeStencilOverlay(shapeName) {
+  // Hide the shapes grid modal
+  document.getElementById('shapesGridModal').style.display = 'none';
+  // Get the overlay canvas
+  const overlay = document.getElementById('aOverlay');
+  overlay.style.display = 'block';
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+  // Fill overlay with black
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, overlay.width, overlay.height);
+  // Draw the shape stencil in the center
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.save();
+  ctx.translate(overlay.width/2, overlay.height/2);
+  ctx.scale(Math.min(overlay.width, overlay.height)/200, Math.min(overlay.width, overlay.height)/200);
+  drawShapeStencil(ctx, shapeName);
+  ctx.restore();
+  ctx.globalCompositeOperation = 'source-over';
+  // Show close button
+  document.getElementById('stencilCloseBtn').style.display = 'flex';
+}
+function drawShapeStencil(ctx, shapeName) {
+    // ...existing code...
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 10;
+  ctx.fillStyle = 'white';
+  switch(shapeName) {
+    case 'Fish':
+      ctx.save();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = 'white';
+      // Fish body outline (sharper head, more open tail)
+      ctx.beginPath();
+      ctx.moveTo(-60, 0);
+      ctx.quadraticCurveTo(0, -56, 60, 0);
+      ctx.quadraticCurveTo(0, 56, -60, 0);
+      ctx.closePath();
+      ctx.stroke();
+      // Fish tail (triangle matches red outline)
+      ctx.beginPath();
+      ctx.moveTo(60, 0);
+      ctx.lineTo(100, -30);
+      ctx.lineTo(100, 30);
+      ctx.lineTo(60, 0);
+      ctx.closePath();
+      ctx.stroke();
+      // Fish eye (shift downward into body to match red dot in image)
+      ctx.beginPath();
+      ctx.arc(-36, 0, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.restore();
+      break;
+    case 'Horizontal Line':
+      ctx.beginPath();
+      ctx.moveTo(-60, 0); ctx.lineTo(60, 0); ctx.stroke(); break;
+    case 'Vertical Line':
+      ctx.beginPath();
+      ctx.moveTo(0, -60); ctx.lineTo(0, 60); ctx.stroke(); break;
+    case 'Slanting Line':
+      ctx.beginPath();
+      ctx.moveTo(-60, 60); ctx.lineTo(60, -60); ctx.stroke(); break;
+    case 'Square':
+      ctx.beginPath();
+      ctx.rect(-50, -50, 100, 100); ctx.stroke(); break;
+    case 'Rectangle':
+      ctx.beginPath();
+      ctx.rect(-70, -40, 140, 80); ctx.stroke(); break;
+    case 'Sun':
+      ctx.save();
+      // Match line width to other stencils
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = 'white';
+      // Center circle radius matches other stencils
+      const baseRadius = 40;
+      // Ray lengths and angles to match icon
+      const rayAngles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4];
+      const rayInner = baseRadius + 10;
+      const rayOuter = baseRadius + 30;
+      // Draw center circle
+      ctx.beginPath();
+      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      // Draw rays
+      for (let i = 0; i < rayAngles.length; i++) {
+        const angle = rayAngles[i];
+        const x1 = Math.cos(angle) * rayInner;
+        const y1 = Math.sin(angle) * rayInner;
+        const x2 = Math.cos(angle) * rayOuter;
+        const y2 = Math.sin(angle) * rayOuter;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+      ctx.restore();
+      break;
+    case 'Hexagon':
+      ctx.beginPath();
+      for(let i=0;i<6;i++){
+        let angle = (Math.PI*2/6)*i - Math.PI/2;
+        let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      } ctx.closePath(); ctx.stroke(); break;
+    case 'Octagon':
+      ctx.beginPath();
+      for(let i=0;i<8;i++){
+        let angle = (Math.PI*2/8)*i - Math.PI/2;
+        let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      } ctx.closePath(); ctx.stroke(); break;
+    case 'Star':
+      ctx.beginPath();
+      for(let i=0;i<10;i++){
+        let angle = (Math.PI/5)*i - Math.PI/2;
+        let r = i%2===0?60:25;
+        let x = Math.cos(angle)*r, y = Math.sin(angle)*r;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      } ctx.closePath(); ctx.stroke(); break;
+    case 'Heart':
+      ctx.beginPath();
+      ctx.moveTo(0, 40); // Bottom point
+      ctx.bezierCurveTo(-60, 10, -30, -60, 0, -10); // Left top curve
+      ctx.bezierCurveTo(30, -60, 60, 10, 0, 40); // Right top curve
+      ctx.closePath();
+      ctx.stroke();
+      break;
+    case 'Smiley':
+      ctx.beginPath();
+      ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(-20, -15, 7, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(20, -15, 7, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 20, 22, Math.PI*0.15, Math.PI*0.85, false); ctx.stroke();
+      break;
+    // ...existing code...
+  }
+}
   </script>
 </body>
 </html>
