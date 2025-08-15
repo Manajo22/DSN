@@ -858,6 +858,7 @@ canvas {
   <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
   <canvas id="aOverlay"></canvas>
   <button id="stencilCloseBtn"></button>
+  <button id="enableSoundBtn" style="display:none;position:fixed;top:60px;right:20px;z-index:2000;padding:12px 24px;font-size:1.2rem;background:#ffb700;color:white;border-radius:12px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);">Enable Sound</button>
 
   <script>
     // Gujarati letters, vowels, numerals
@@ -1071,19 +1072,19 @@ canvas {
     // Detect touch device
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
       isTouchDevice = true;
-      // Fix for iOS/Android: resume audio context on first touch
-      window.addEventListener('touchstart', async function once() {
-        if (Tone.context && Tone.context.state === 'suspended') {
-          await Tone.context.resume();
-        }
-        window.removeEventListener('touchstart', once);
+      // Show enable sound button if context is suspended
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          if (Tone.context && Tone.context.state === 'suspended') {
+            document.getElementById('enableSoundBtn').style.display = 'block';
+          }
+        }, 500);
       });
-      // Also handle first click for some browsers
-      window.addEventListener('click', async function once() {
+      document.getElementById('enableSoundBtn').addEventListener('click', async function() {
         if (Tone.context && Tone.context.state === 'suspended') {
           await Tone.context.resume();
         }
-        window.removeEventListener('click', once);
+        this.style.display = 'none';
       });
     }
 
