@@ -1071,6 +1071,20 @@ canvas {
     // Detect touch device
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
       isTouchDevice = true;
+      // Fix for iOS/Android: resume audio context on first touch
+      window.addEventListener('touchstart', async function once() {
+        if (Tone.context && Tone.context.state === 'suspended') {
+          await Tone.context.resume();
+        }
+        window.removeEventListener('touchstart', once);
+      });
+      // Also handle first click for some browsers
+      window.addEventListener('click', async function once() {
+        if (Tone.context && Tone.context.state === 'suspended') {
+          await Tone.context.resume();
+        }
+        window.removeEventListener('click', once);
+      });
     }
 
     // Create letter grid
