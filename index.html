@@ -1282,6 +1282,9 @@ canvas {
       if (!audioInitialized) {
         try {
           await Tone.start();
+          if (Tone.context && Tone.context.state === 'suspended') {
+            await Tone.context.resume();
+          }
           synth = new Tone.AMSynth().toDestination();
           audioInitialized = true;
           console.log('Audio initialized successfully');
