@@ -37,6 +37,7 @@
   justify-items: center;
   align-items: center;
 }
+
   @font-face {
     font-family: 'Gopika';
     src: url('https://cdn.jsdelivr.net/gh/gujaratilexicon/fonts@master/fonts/gopika/Gopika.ttf') format('truetype');
@@ -51,8 +52,8 @@
   font-family: 'Gopika', 'Noto Sans Gujarati', sans-serif !important;
   border-radius: 50%;
   border: 2px solid #666;
-  width: clamp(50px, 8vw, 70px);
-  height: clamp(50px, 8vw, 70px);
+  width: clamp(60px, 10vw, 80px);
+  height: clamp(60px, 10vw, 80px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,6 +89,7 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 10px;
+  position: relative;
 }
 .gujarati-item {
   width: clamp(60px, 8vw, 80px);
@@ -111,9 +113,9 @@
   background: #fff7e0;
 }
 #closeGujaratiGrid {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   width: 40px;
   height: 40px;
   border: none;
@@ -125,29 +127,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
-@media (max-width: 900px), (max-width: 1024px) and (orientation: portrait), (max-width: 1024px) and (orientation: landscape) {
-  html, body, canvas, #aOverlay {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: 100vw !important;
-    max-height: 100vh !important;
-    font-family: "CLT Apfel Grotezk", sans-serif !important;
-  }
-  #title, #prompt {
-    font-family: "CLT Apfel Grotezk", sans-serif !important;
-  }
-  #letterGrid, .letter-item {
-    font-family: "comic-sans-ms", sans-serif !important;
-    font-weight: 400 !important;
-    font-style: normal !important;
-  }
-}
+
 /* Overlay cross button for stencil mode */
 #stencilCloseBtn {
   position: fixed;
-  top: clamp(10px, 2vh, 20px);
-  right: clamp(10px, 2vw, 20px);
+  top: 20px;
+  right: 20px;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -176,6 +163,7 @@
   border-radius: 1px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
+
 #stencilCloseBtn:after {
   content: '';
   position: absolute;
@@ -288,22 +276,27 @@ canvas {
   display: none;
 }
 
-/* Circular dropdown styles */
-#circularDropdown {
+/* FIXED BUTTON CONTAINER WITH EQUAL SIZING */
+#buttonContainer {
   position: fixed;
   top: clamp(80px, 15vh, 120px);
   left: clamp(20px, 4vw, 40px);
   z-index: 15;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: clamp(15px, 3vw, 24px);
 }
 
-#dropdownToggle {
-  width: clamp(60px, 10vw, 80px);
-  height: clamp(60px, 10vw, 80px);
+/* UNIFIED BUTTON SIZING - ALL BUTTONS SAME SIZE */
+#dropdownToggle,
+#aBtn,
+#gujaratiBtn,
+#shapesBtn {
+  width: clamp(60px, 10vw, 80px) !important;
+  height: clamp(60px, 10vw, 80px) !important;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff179e, #9855fe, #45a0fc);
-  border: none;
-  color: white;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  border: 2px solid #666;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -311,29 +304,64 @@ canvas {
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
-#dropdownToggle:hover {
+#dropdownToggle {
+  background: linear-gradient(135deg, #ff179e, #9855fe, #45a0fc);
+  color: white;
+}
+
+#aBtn {
+  background-color: #000;
+  color: white;
+}
+
+#gujaratiBtn {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Gopika', 'Noto Sans Gujarati', sans-serif !important;
+}
+
+#shapesBtn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 2px solid #999;
+}
+
+#dropdownToggle:hover,
+#aBtn:hover,
+#gujaratiBtn:hover,
+#shapesBtn:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  border: 3px solid #ffb700 !important;
 }
 
-#dropdownToggle.selected {
-  box-shadow: none;
-}
-
+/* VERTICAL DROPDOWN MENU - NO TITLES, ALL ELEMENTS VERTICALLY */
 #dropdownMenu {
   position: absolute;
-  top: calc(100% + 20px);
+  top: calc(100% + 15px);
   left: 0;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
   pointer-events: none;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  min-width: 80px;
+  max-height: 60vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 12px;
 }
 
 #dropdownMenu.open {
@@ -342,62 +370,63 @@ canvas {
   pointer-events: all;
 }
 
-.dropdown-row {
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  align-items: center;
+/* Scrollbar styling */
+#dropdownMenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+#dropdownMenu::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+#dropdownMenu::-webkit-scrollbar-thumb {
+  background: #ff179e;
+  border-radius: 3px;
+}
+
+#dropdownMenu::-webkit-scrollbar-thumb:hover {
+  background: #d1147a;
 }
 
 .dropdown-item {
   position: relative;
-  width: clamp(50px, 8vw, 65px);
-  height: clamp(50px, 8vw, 65px);
+  width: clamp(50px, 8vw, 60px);
+  height: clamp(50px, 8vw, 60px);
   border-radius: 50%;
-  border: none;
+  border: 2px solid #ccc;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(0.7rem, 1.2vw, 1rem);
+  font-size: clamp(0.8rem, 1.4vw, 1.2rem);
   color: white;
   font-family: "CLT Apfel Grotezk", sans-serif !important;
   font-weight: bold;
-  transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .dropdown-item:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-/* Only solid yellow border for hovered and selected buttons, no yellow glow */
-.dropdown-item.selected,
-#dropdownToggle.selected,
-.gujarati-button.selected,
-.dropdown-item:hover,
-#dropdownToggle:hover,
-.gujarati-button:hover {
   border: 3px solid #ffb700 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
-.dropdown-item.selected {
-  box-shadow: none;
-}
-
-/* Add yellow outline and glow for selected buttons */
 .dropdown-item.selected,
 #dropdownToggle.selected,
-.gujarati-button.selected {
+#aBtn.selected,
+#gujaratiBtn.selected,
+#shapesBtn.selected {
   border: 3px solid #ffb700 !important;
   box-shadow: 0 0 15px #ffb700, 0 0 25px #ffb700, 0 0 35px #ffb700 !important;
 }
 
+/* Vertical brush size slider */
 #brushSizeContainer {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -407,7 +436,6 @@ canvas {
   border-radius: 15px;
   border: 2px solid rgb(255, 0, 221);
   backdrop-filter: blur(10px);
-  transform: none;
 }
 
 /* A Mode Cancel Button */
@@ -461,6 +489,7 @@ canvas {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 10px;
+  position: relative;
 }
 
 .letter-item {
@@ -489,9 +518,9 @@ canvas {
 }
 
 #closeLetterGrid {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   width: 40px;
   height: 40px;
   border: none;
@@ -503,6 +532,7 @@ canvas {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 /* Color button styles */
@@ -553,19 +583,16 @@ canvas {
   border: 3px solid #999;
 }
 
-.a-button {
-  background-color: #000;
-  color: white;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-}
-
+/* Vertical brush size slider */
 #brushSizeSlider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 80px;
-  height: 6px;
+  -webkit-appearance: slider-vertical;
+  writing-mode: bt-lr; /* IE */
+  -webkit-writing-mode: bt-lr; /* Webkit */
+  writing-mode: vertical-lr; /* Standard */
+  width: 6px;
+  height: 80px;
   border-radius: 3px;
-  background: linear-gradient(to right, rgb(255, 0, 221), rgb(255, 100, 200));
+  background: linear-gradient(to top, rgb(255, 0, 221), rgb(255, 100, 200));
   outline: none;
   opacity: 0.9;
   transition: opacity 0.2s;
@@ -661,172 +688,102 @@ canvas {
   display: none;
 }
 
-/* Prevent text selection for all options and buttons */
-.dropdown-item,
-#dropdownToggle,
-.gujarati-button,
-.letter-item,
-.gujarati-item,
-#aCancelBtn,
-#mainResetBtn,
-#cameraBtn,
-#stencilCloseBtn,
-#closeLetterGrid,
-#closeGujaratiGrid {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-/* Responsive positioning for dropdown items */
+/* RESPONSIVE ADJUSTMENTS - MAINTAIN EQUAL SIZING */
 @media (max-width: 900px) {
-  #circularDropdown {
-    top: clamp(60px, 10vh, 90px);
+  #buttonContainer {
+    top: clamp(60px, 10vh, 80px);
     left: clamp(10px, 2vw, 20px);
+    gap: clamp(10px, 2vw, 15px);
   }
-  #dropdownToggle {
-    width: 48px;
-    height: 48px;
-    font-size: 1rem;
+  
+  #dropdownToggle,
+  #aBtn,
+  #gujaratiBtn,
+  #shapesBtn {
+    width: clamp(50px, 8vw, 65px) !important;
+    height: clamp(50px, 8vw, 65px) !important;
+    font-size: clamp(1rem, 1.6vw, 1.4rem) !important;
   }
+  
+  #dropdownMenu {
+    min-width: 70px;
+    padding: 12px;
+  }
+  
   .dropdown-item {
-    width: 38px;
-    height: 38px;
-    font-size: 0.8rem;
+    width: clamp(40px, 6vw, 50px);
+    height: clamp(40px, 6vw, 50px);
+    font-size: clamp(0.7rem, 1.2vw, 1rem);
   }
-  .dropdown-row {
-    gap: 8px;
-  }
-  #brushSizeContainer {
-    padding: 6px;
-  }
-  #brushSizeSlider {
-    width: 48px;
-  }
-  #aCancelBtn {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9rem;
-    top: clamp(10px, 2vh, 20px);
-    right: clamp(10px, 2vw, 20px);
-  }
+  
   #letterGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    padding: 10px;
+    grid-template-columns: repeat(4, 1fr);
   }
-  .letter-item {
-    width: clamp(38px, 10vw, 48px);
-    height: clamp(38px, 10vw, 48px);
-    font-size: clamp(0.7rem, 2vw, 1rem);
-  }
-  #mainResetBtn, #cameraBtn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.7rem;
-    border-radius: 12px;
-  }
-  #title {
-    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
-    padding: clamp(0.3rem, 0.6rem, 0.8rem);
-  }
-  #prompt {
-    top: 88%;
-    font-size: clamp(0.7rem, 1vw, 1rem);
-    padding: 0.7rem 1.2rem;
-    border-radius: 14px;
+  
+  #gujaratiGrid {
+    grid-template-columns: repeat(8, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  #circularDropdown {
-    top: clamp(40px, 7vh, 60px);
-    left: clamp(6px, 1vw, 12px);
+  #buttonContainer {
+    top: clamp(50px, 8vh, 60px);
+    left: clamp(5px, 1vw, 10px);
+    gap: clamp(8px, 1.5vw, 12px);
   }
-  #dropdownToggle {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9rem;
+  
+  #dropdownToggle,
+  #aBtn,
+  #gujaratiBtn,
+  #shapesBtn {
+    width: clamp(45px, 7vw, 55px) !important;
+    height: clamp(45px, 7vw, 55px) !important;
+    font-size: clamp(0.9rem, 1.4vw, 1.2rem) !important;
   }
+  
+  #dropdownMenu {
+    min-width: 60px;
+    padding: 10px;
+  }
+  
   .dropdown-item {
-    width: 30px;
-    height: 30px;
-    font-size: 0.7rem;
+    width: clamp(35px, 5vw, 45px);
+    height: clamp(35px, 5vw, 45px);
+    font-size: clamp(0.6rem, 1vw, 0.9rem);
   }
-  .dropdown-row {
-    gap: 5px;
-  }
-  #brushSizeContainer {
-    padding: 4px;
-  }
-  #brushSizeSlider {
-    width: 32px;
-  }
-  #aCancelBtn {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-    top: clamp(6px, 1vh, 12px);
-    right: clamp(6px, 1vw, 12px);
-  }
+  
   #letterGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  #gujaratiGrid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  
+  #shapesGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    padding: 6px;
-  }
-  .letter-item {
-    width: clamp(28px, 8vw, 36px);
-    height: clamp(28px, 8vw, 36px);
-    font-size: clamp(0.6rem, 2vw, 0.9rem);
-  }
-  #mainResetBtn, #cameraBtn {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
-  }
-  #title {
-    font-size: clamp(0.7rem, 1vw, 1rem);
-    padding: clamp(0.2rem, 0.4rem, 0.6rem);
-  }
-  #prompt {
-    top: 86%;
-    font-size: clamp(0.6rem, 0.8vw, 0.9rem);
-    padding: 0.5rem 0.8rem;
-    border-radius: 10px;
   }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {
-  #circularDropdown {
-    top: clamp(30px, 6vh, 40px);
-    left: clamp(6px, 1vw, 12px);
+  #buttonContainer {
+    top: clamp(30px, 6vh, 50px);
+    left: clamp(5px, 1vw, 10px);
+    gap: clamp(6px, 1vw, 10px);
   }
-  #title {
-    font-size: clamp(0.7rem, 1vw, 1rem);
-    padding: clamp(0.2rem, 0.4rem, 0.6rem);
+  
+  #dropdownToggle,
+  #aBtn,
+  #gujaratiBtn,
+  #shapesBtn {
+    width: clamp(40px, 6vw, 50px) !important;
+    height: clamp(40px, 6vw, 50px) !important;
+    font-size: clamp(0.8rem, 1.2vw, 1rem) !important;
   }
-  #prompt {
-    top: 80%;
-    font-size: clamp(0.6rem, 0.8vw, 0.9rem);
-    padding: 0.4rem 0.7rem;
-    border-radius: 8px;
-  }
-  .dropdown-row {
-    gap: 4px;
-  }
-  .dropdown-item {
-    width: 24px;
-    height: 24px;
-    font-size: 0.6rem;
-  }
-  #dropdownToggle {
-    width: 24px;
-    height: 24px;
-    font-size: 0.7rem;
-  }
-  #aCancelBtn {
-    width: 24px;
-    height: 24px;
-    font-size: 0.7rem;
+  
+  #dropdownMenu {
+    max-height: 50vh;
+    min-width: 50px;
   }
 }
   </style>
@@ -837,43 +794,38 @@ canvas {
 
   <div id="title">Draw, Hide, and Scratch to reveal!</div>
   
-  <!-- Circular Dropdown -->
-  <div id="circularDropdown">
+  <!-- FIXED BUTTON CONTAINER -->
+  <div id="buttonContainer">
     <button id="dropdownToggle">☰</button>
-    <div id="dropdownMenu">
-      <!-- Colors row -->
-      <div class="dropdown-row">
-        <button class="dropdown-item pink" data-color="rgb(255, 0, 221)"></button>
-        <button class="dropdown-item purple" data-color="rgb(92, 0, 157)"></button>
-        <button class="dropdown-item yellow" data-color="rgb(255, 187, 0)"></button>
-        <button class="dropdown-item orange" data-color="rgb(255, 77, 0)"></button>
-        <button class="dropdown-item blue" data-color="rgb(125, 244, 255)"></button>
-      </div>
-      
-      <!-- Tools row -->
-      <div class="dropdown-row">
-        <button class="dropdown-item gradient" id="gradientBtn">🌈</button>
-        <button class="dropdown-item eraser" id="eraserBtn" style="padding:0;display:flex;align-items:center;justify-content:center;">
-          <span style="display:inline-block;width:22px;height:22px;background:#000;border-radius:3px;position:relative;">
-            <span style="display:block;position:absolute;left:8px;top:2px;width:6px;height:18px;background:#fff;border-radius:2px;"></span>
-          </span>
-        </button>
-        
-        <!-- Brush size container positioned to the right -->
-        <div id="brushSizeContainer">
-          <input type="range" id="brushSizeSlider" min="5" max="50" value="30" step="1">
-          <span id="brushSizeLabel">30px</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- A/a button positioned to the right of dropdown toggle -->
-    <button class="dropdown-item a-button" id="aBtn" style="position: absolute; top: 0; left: calc(100% + 20px);">A/a</button>
-    <button class="gujarati-button" id="gujaratiBtn" style="position: absolute; top: 0; left: calc(100% + 100px);">ક</button>
-    <!-- Add Shapes button next to Gujarati button -->
-    <button class="dropdown-item shapes-button" id="shapesBtn" style="position: absolute; top: 0; left: calc(100% + 180px);">
+    <button id="aBtn">A/a</button>
+    <button id="gujaratiBtn">ક</button>
+    <button id="shapesBtn">
       <span style="display:inline-block;width:1.5em;height:1.5em;border-radius:50%;background:#222;border:2px solid #fff;"></span>
     </button>
+    
+    <!-- VERTICAL DROPDOWN MENU - NO TITLES -->
+    <div id="dropdownMenu">
+      <!-- Colors arranged vertically -->
+      <button class="dropdown-item pink" data-color="rgb(255, 0, 221)"></button>
+      <button class="dropdown-item purple" data-color="rgb(92, 0, 157)"></button>
+      <button class="dropdown-item yellow" data-color="rgb(255, 187, 0)"></button>
+      <button class="dropdown-item orange" data-color="rgb(255, 77, 0)"></button>
+      <button class="dropdown-item blue" data-color="rgb(125, 244, 255)"></button>
+      
+      <!-- Tools arranged vertically -->
+      <button class="dropdown-item gradient" id="gradientBtn">🌈</button>
+      <button class="dropdown-item eraser" id="eraserBtn" style="padding:0;display:flex;align-items:center;justify-content:center;">
+        <span style="display:inline-block;width:22px;height:22px;background:#000;border-radius:3px;position:relative;">
+          <span style="display:block;position:absolute;left:8px;top:2px;width:6px;height:18px;background:#fff;border-radius:2px;"></span>
+        </span>
+      </button>
+      
+      <!-- Vertical Brush Size Slider -->
+      <div id="brushSizeContainer">
+        <input type="range" id="brushSizeSlider" min="5" max="50" value="30" step="1" orient="vertical">
+        <span id="brushSizeLabel">30px</span>
+      </div>
+    </div>
   </div>
 
   <!-- Letter Grid Modal -->
@@ -891,8 +843,8 @@ canvas {
 
   <!-- Shapes Grid Modal -->
   <div id="shapesGridModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:1000;">
-    <div id="shapesGrid" style="background:white;border-radius:22px;padding:18px 8px 8px 8px;max-width:96vw;max-height:80vh;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;">
-      <button id="closeShapesGrid" style="position:absolute;top:10px;right:10px;width:40px;height:40px;border:none;background:#ffb700;color:white;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div id="shapesGrid" style="background:white;border-radius:22px;padding:40px 20px 20px 20px;max-width:90vw;max-height:80vh;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;">
+  <button id="closeShapesGrid" style="position:fixed;top:20px;right:20px;width:40px;height:40px;border:none;background:#ffb700;color:white;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1001;">✕</button>
       <!-- Shape buttons will be injected here -->
     </div>
   </div>
@@ -994,7 +946,7 @@ canvas {
       drawGujaratiStencilOverlay(char);
       stencilCloseBtn.style.display = 'flex';
       aOverlay.style.display = 'block';
-      document.getElementById('circularDropdown').style.zIndex = 40;
+      document.getElementById('buttonContainer').style.zIndex = 40;
       document.getElementById('mainResetBtn').style.zIndex = 40;
       document.getElementById('cameraBtn').style.zIndex = 40;
       document.getElementById('title').style.zIndex = 40;
@@ -1032,7 +984,7 @@ canvas {
       stencilCloseBtn.style.display = 'flex';
       aOverlay.style.display = 'block';
       // Keep dropdown and UI visible
-      document.getElementById('circularDropdown').style.zIndex = 40;
+      document.getElementById('buttonContainer').style.zIndex = 40;
       document.getElementById('mainResetBtn').style.zIndex = 40;
       document.getElementById('cameraBtn').style.zIndex = 40;
       document.getElementById('title').style.zIndex = 40;
@@ -1068,7 +1020,7 @@ canvas {
       aOverlay.style.display = 'none';
       stencilCloseBtn.style.display = 'none';
       // Restore z-indexes
-      document.getElementById('circularDropdown').style.zIndex = 15;
+      document.getElementById('buttonContainer').style.zIndex = 15;
       document.getElementById('mainResetBtn').style.zIndex = 10;
       document.getElementById('cameraBtn').style.zIndex = 10;
       document.getElementById('title').style.zIndex = 10;
@@ -1447,15 +1399,9 @@ canvas {
     }
 
     document.getElementById('cameraBtn').onclick = function() {
-  var canvas = document.getElementById('colorCanvas');
-  var dataURL = canvas.toDataURL('image/png');
-  var a = document.createElement('a');
-  a.href = dataURL;
-  a.download = 'drawing.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
+  console.log('cameraBtn clicked');
+  captureCanvas();
+    };
 
     function getColorAtPixel(x, y) {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
@@ -1899,19 +1845,6 @@ canvas {
       setEraserMode(this);
     });
 
-    // A/a button
-    document.getElementById('aBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('letterGridModal').style.display = 'flex';
-    });
-
-    document.getElementById('aBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('letterGridModal').style.display = 'flex';
-    });
-
     // Close letter grid
     document.getElementById('closeLetterGrid').addEventListener('click', function(e) {
       e.preventDefault();
@@ -1959,17 +1892,6 @@ canvas {
       resetCanvas();
     });
 
-    // Camera button
-    document.getElementById('cameraBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      captureCanvas();
-    });
-
-    document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      captureCanvas();
-    });
-
     // Canvas drawing events
     if (isTouchDevice) {
       colorCanvas.addEventListener('touchstart', startDraw, { passive: false });
@@ -1985,8 +1907,6 @@ canvas {
     document.addEventListener('touchstart', initAudio, { once: true });
     document.addEventListener('click', initAudio, { once: true });
 
-   
-
     // Continuous audio maintenance for eraser
     setInterval(maintainEraserAudio, 50);
 
@@ -1994,224 +1914,246 @@ canvas {
     setColor('rgb(255, 0, 221)', document.querySelector('.dropdown-item.pink'));
 
     const shapesList = [
-  {name:'Horizontal Line',svg:'<svg width="40" height="40"><line x1="5" y1="20" x2="35" y2="20" stroke="#222" stroke-width="4"/></svg>'},
-  {name:'Vertical Line',svg:'<svg width="40" height="40"><line x1="20" y1="5" x2="20" y2="35" stroke="#222" stroke-width="4"/></svg>'},
-  {name:'Slanting Line',svg:'<svg width="40" height="40"><line x1="8" y1="32" x2="32" y2="8" stroke="#222" stroke-width="4"/></svg>'},
-  {name:'Square',svg:'<svg width="40" height="40"><rect x="8" y="8" width="24" height="24" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Rectangle',svg:'<svg width="40" height="40"><rect x="5" y="12" width="30" height="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Circle',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Triangle',svg:'<svg width="40" height="40"><polygon points="20,6 34,34 6,34" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Semicircle',svg:'<svg width="40" height="40"><path d="M8,32 A12,12 0 0,1 32,32" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Trapezoid',svg:'<svg width="40" height="40"><polygon points="10,34 30,34 34,14 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Pentagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,16 28,34 12,34 6,16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Hexagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,14 34,26 20,34 6,26 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Octagon',svg:'<svg width="40" height="40"><polygon points="12,6 28,6 34,12 34,28 28,34 12,34 6,28 6,12" stroke="#222" stroke-width="4" fill="none"/></svg>'},
-  {name:'Star',svg:'<svg width="40" height="40"><polygon points="20,6 24,16 34,16 26,22 30,32 20,26 10,32 14,22 6,16 16,16" stroke="#222" stroke-width="3" fill="none"/></svg>'},
-  {name:'Heart',svg:'<svg width="40" height="40"><path d="M20,36 C-8,12 8,-8 20,8 C32,-8 48,12 20,36 Z" stroke="#222" stroke-width="3" fill="none"/></svg>'},
-  {name:'Smiley',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="14" stroke="#222" stroke-width="3" fill="none"/><circle cx="15" cy="17" r="2" fill="#222"/><circle cx="25" cy="17" r="2" fill="#222"/><path d="M14,25 Q20,30 26,25" stroke="#222" stroke-width="2" fill="none"/></svg>'},
-  {name:'Sun',svg:'<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="10" stroke="#222" stroke-width="3" fill="none"/><g stroke="#222" stroke-width="3"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/><line x1="7" y1="7" x2="13" y2="13"/><line x1="27" y1="27" x2="33" y2="33"/><line x1="7" y1="33" x2="13" y2="27"/><line x1="27" y1="13" x2="33" y2="7"/></g></svg>'},
-  {name:'Fish',svg:'<svg width="40" height="40" viewBox="-60 -40 160 80"><g><path d="M-60,0 Q0,-56 60,0 Q0,56 -60,0 Z" stroke="#222" stroke-width="8" fill="none"/><polygon points="60,0 100,-30 100,30" stroke="#222" stroke-width="8" fill="none"/><circle cx="-36" cy="0" r="4" fill="#222"/></g></svg>'}
-];
+      {name:'Horizontal Line',svg:'<svg width="40" height="40"><line x1="5" y1="20" x2="35" y2="20" stroke="#222" stroke-width="4"/></svg>'},
+      {name:'Vertical Line',svg:'<svg width="40" height="40"><line x1="20" y1="5" x2="20" y2="35" stroke="#222" stroke-width="4"/></svg>'},
+      {name:'Slanting Line',svg:'<svg width="40" height="40"><line x1="8" y1="32" x2="32" y2="8" stroke="#222" stroke-width="4"/></svg>'},
+      {name:'Square',svg:'<svg width="40" height="40"><rect x="8" y="8" width="24" height="24" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Rectangle',svg:'<svg width="40" height="40"><rect x="5" y="12" width="30" height="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Circle',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Triangle',svg:'<svg width="40" height="40"><polygon points="20,6 34,34 6,34" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Semicircle',svg:'<svg width="40" height="40"><path d="M8,32 A12,12 0 0,1 32,32" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Trapezoid',svg:'<svg width="40" height="40"><polygon points="10,34 30,34 34,14 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Pentagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,16 28,34 12,34 6,16" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Hexagon',svg:'<svg width="40" height="40"><polygon points="20,6 34,14 34,26 20,34 6,26 6,14" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Octagon',svg:'<svg width="40" height="40"><polygon points="12,6 28,6 34,12 34,28 28,34 12,34 6,28 6,12" stroke="#222" stroke-width="4" fill="none"/></svg>'},
+      {name:'Star',svg:'<svg width="40" height="40"><polygon points="20,6 24,16 34,16 26,22 30,32 20,26 10,32 14,22 6,16 16,16" stroke="#222" stroke-width="3" fill="none"/></svg>'},
+      {name:'Heart',svg:'<svg width="40" height="40"><path d="M20,36 C-8,12 8,-8 20,8 C32,-8 48,12 20,36 Z" stroke="#222" stroke-width="3" fill="none"/></svg>'},
+      {name:'Smiley',svg:'<svg width="40" height="40"><circle cx="20" cy="20" r="14" stroke="#222" stroke-width="3" fill="none"/><circle cx="15" cy="17" r="2" fill="#222"/><circle cx="25" cy="17" r="2" fill="#222"/><path d="M14,25 Q20,30 26,25" stroke="#222" stroke-width="2" fill="none"/></svg>'},
+      {name:'Sun',svg:'<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="10" stroke="#222" stroke-width="3" fill="none"/><g stroke="#222" stroke-width="3"><line x1="20" y1="2" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="38"/><line x1="2" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="38" y2="20"/><line x1="7" y1="7" x2="13" y2="13"/><line x1="27" y1="27" x2="33" y2="33"/><line x1="7" y1="33" x2="13" y2="27"/><line x1="27" y1="13" x2="33" y2="7"/></g></svg>'},
+      {name:'Fish',svg:'<svg width="40" height="40" viewBox="-60 -40 160 80"><g><path d="M-60,0 Q0,-56 60,0 Q0,56 -60,0 Z" stroke="#222" stroke-width="8" fill="none"/><polygon points="60,0 100,-30 100,30" stroke="#222" stroke-width="8" fill="none"/><circle cx="-36" cy="0" r="4" fill="#222"/></g></svg>'}
+    ];
 
-function createShapesGrid() {
-  const shapesGrid = document.getElementById('shapesGrid');
-  const closeBtn = document.getElementById('closeShapesGrid');
-  shapesGrid.innerHTML = '';
-  shapesGrid.appendChild(closeBtn);
-  shapesList.forEach(shape => {
-    const item = document.createElement('button');
-    item.className = 'shapes-item';
-    item.title = shape.name;
-    item.innerHTML = shape.svg;
-    item.style.width = '64px';
-    item.style.height = '64px';
-    item.style.background = 'white';
-    item.style.border = '2px solid #ccc';
-    item.style.borderRadius = '50%';
-    item.style.display = 'flex';
-    item.style.alignItems = 'center';
-    item.style.justifyContent = 'center';
-    item.style.cursor = 'pointer';
-    item.style.transition = 'all 0.3s ease';
-    item.style.margin = '12px';
-    item.style.padding = '0';
-    item.style.userSelect = 'none';
-    item.style.fontSize = '1.2rem';
-    item.onmouseover = () => { item.style.borderColor = '#ffb700'; };
-    item.onmouseout = () => { item.style.borderColor = '#ccc'; };
-    item.onclick = () => showShapeStencilOverlay(shape.name);
-    shapesGrid.appendChild(item);
-  });
-}
+    function createShapesGrid() {
+      const shapesGrid = document.getElementById('shapesGrid');
+      const closeBtn = document.getElementById('closeShapesGrid');
+      shapesGrid.innerHTML = '';
+      shapesGrid.appendChild(closeBtn);
+      shapesList.forEach(shape => {
+        const item = document.createElement('button');
+        item.className = 'shapes-item';
+        item.title = shape.name;
+        item.innerHTML = shape.svg;
+        item.onclick = () => showShapeStencilOverlay(shape.name);
+        shapesGrid.appendChild(item);
+      });
+    }
 
-// Show shapes grid modal
-const shapesBtn = document.getElementById('shapesBtn');
-shapesBtn.addEventListener('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  document.getElementById('letterGridModal').style.display = 'none';
-  document.getElementById('gujaratiGridModal').style.display = 'none';
-  createShapesGrid();
-  document.getElementById('shapesGridModal').style.display = 'flex';
-});
-shapesBtn.addEventListener('touchend', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  document.getElementById('letterGridModal').style.display = 'none';
-  document.getElementById('gujaratiGridModal').style.display = 'none';
-  createShapesGrid();
-  document.getElementById('shapesGridModal').style.display = 'flex';
-});
-// Close shapes grid
-const closeShapesGrid = document.getElementById('closeShapesGrid');
-closeShapesGrid.addEventListener('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  document.getElementById('shapesGridModal').style.display = 'none';
-});
+    // Show shapes grid modal
+    const shapesBtn = document.getElementById('shapesBtn');
+    shapesBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'none';
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+      createShapesGrid();
+      document.getElementById('shapesGridModal').style.display = 'flex';
+    });
+    shapesBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('letterGridModal').style.display = 'none';
+      document.getElementById('gujaratiGridModal').style.display = 'none';
+      createShapesGrid();
+      document.getElementById('shapesGridModal').style.display = 'flex';
+    });
+    // Close shapes grid
+    const closeShapesGrid = document.getElementById('closeShapesGrid');
+    closeShapesGrid.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('shapesGridModal').style.display = 'none';
+    });
 
     function showShapeStencilOverlay(shapeName) {
-  // Hide the shapes grid modal
-  document.getElementById('shapesGridModal').style.display = 'none';
-  // Get the overlay canvas
-  const overlay = document.getElementById('aOverlay');
-  overlay.style.display = 'block';
-  const ctx = overlay.getContext('2d');
-  ctx.clearRect(0, 0, overlay.width, overlay.height);
-  // Fill overlay with black
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, overlay.width, overlay.height);
-  // Draw the shape stencil in the center
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.save();
-  ctx.translate(overlay.width/2, overlay.height/2);
-  ctx.scale(Math.min(overlay.width, overlay.height)/200, Math.min(overlay.width, overlay.height)/200);
-  drawShapeStencil(ctx, shapeName);
-  ctx.restore();
-  ctx.globalCompositeOperation = 'source-over';
-  // Show close button
-  document.getElementById('stencilCloseBtn').style.display = 'flex';
-}
-function drawShapeStencil(ctx, shapeName) {
-    // ...existing code...
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 10;
-  ctx.fillStyle = 'white';
-  switch(shapeName) {
-    case 'Fish':
+      // Hide the shapes grid modal
+      document.getElementById('shapesGridModal').style.display = 'none';
+      // Get the overlay canvas
+      const overlay = document.getElementById('aOverlay');
+      overlay.style.display = 'block';
+      const ctx = overlay.getContext('2d');
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
+      // Fill overlay with black
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, overlay.width, overlay.height);
+      // Draw the shape stencil in the center
+      ctx.globalCompositeOperation = 'destination-out';
       ctx.save();
-      ctx.lineWidth = 10;
+      ctx.translate(overlay.width/2, overlay.height/2);
+      ctx.scale(Math.min(overlay.width, overlay.height)/200, Math.min(overlay.width, overlay.height)/200);
+      drawShapeStencil(ctx, shapeName);
+      ctx.restore();
+      ctx.globalCompositeOperation = 'source-over';
+      // Show close button
+      document.getElementById('stencilCloseBtn').style.display = 'flex';
+      // Set stencil mode
+      isStencilMode = true;
+    }
+
+    function drawShapeStencil(ctx, shapeName) {
       ctx.strokeStyle = 'white';
-      // Fish body outline (sharper head, more open tail)
-      ctx.beginPath();
-      ctx.moveTo(-60, 0);
-      ctx.quadraticCurveTo(0, -56, 60, 0);
-      ctx.quadraticCurveTo(0, 56, -60, 0);
-      ctx.closePath();
-      ctx.stroke();
-      // Fish tail (triangle matches red outline)
-      ctx.beginPath();
-      ctx.moveTo(60, 0);
-      ctx.lineTo(100, -30);
-      ctx.lineTo(100, 30);
-      ctx.lineTo(60, 0);
-      ctx.closePath();
-      ctx.stroke();
-      // Fish eye (shift downward into body to match red dot in image)
-      ctx.beginPath();
-      ctx.arc(-36, 0, 3, 0, Math.PI * 2);
+      ctx.lineWidth = 10;
       ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.restore();
-      break;
-    case 'Horizontal Line':
-      ctx.beginPath();
-      ctx.moveTo(-60, 0); ctx.lineTo(60, 0); ctx.stroke(); break;
-    case 'Vertical Line':
-      ctx.beginPath();
-      ctx.moveTo(0, -60); ctx.lineTo(0, 60); ctx.stroke(); break;
-    case 'Slanting Line':
-      ctx.beginPath();
-      ctx.moveTo(-60, 60); ctx.lineTo(60, -60); ctx.stroke(); break;
-    case 'Square':
-      ctx.beginPath();
-      ctx.rect(-50, -50, 100, 100); ctx.stroke(); break;
-    case 'Rectangle':
-      ctx.beginPath();
-      ctx.rect(-70, -40, 140, 80); ctx.stroke(); break;
-    case 'Sun':
-      ctx.save();
-      // Match line width to other stencils
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = 'white';
-      // Center circle radius matches other stencils
-      const baseRadius = 40;
-      // Ray lengths and angles to match icon
-      const rayAngles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4];
-      const rayInner = baseRadius + 10;
-      const rayOuter = baseRadius + 30;
-      // Draw center circle
-      ctx.beginPath();
-      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
-      ctx.stroke();
-      // Draw rays
-      for (let i = 0; i < rayAngles.length; i++) {
-        const angle = rayAngles[i];
-        const x1 = Math.cos(angle) * rayInner;
-        const y1 = Math.sin(angle) * rayInner;
-        const x2 = Math.cos(angle) * rayOuter;
-        const y2 = Math.sin(angle) * rayOuter;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
+      switch(shapeName) {
+        case 'Triangle':
+          ctx.beginPath();
+          ctx.moveTo(0, -60); // top
+          ctx.lineTo(52, 52); // bottom right
+          ctx.lineTo(-52, 52); // bottom left
+          ctx.closePath();
+          ctx.stroke();
+          break;
+        case 'Semicircle':
+          ctx.beginPath();
+          ctx.arc(0, 0, 60, Math.PI, 0, false); // semicircle (bottom flat)
+          ctx.stroke();
+          break;
+        case 'Trapezoid':
+          ctx.beginPath();
+          ctx.moveTo(-40, 52); // bottom left
+          ctx.lineTo(40, 52); // bottom right
+          ctx.lineTo(60, -40); // top right
+          ctx.lineTo(-60, -40); // top left
+          ctx.closePath();
+          ctx.stroke();
+          break;
+        case 'Pentagon':
+          ctx.beginPath();
+          for(let i=0;i<5;i++){
+            let angle = (Math.PI*2/5)*i - Math.PI/2;
+            let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+          break;
+        case 'Fish':
+          ctx.save();
+          ctx.lineWidth = 10;
+          ctx.strokeStyle = 'white';
+          // Center the fish by adjusting translation
+          ctx.translate(-20, 0);
+          // Fish body outline (sharper head, more open tail)
+          ctx.beginPath();
+          ctx.moveTo(-60, 0);
+          ctx.quadraticCurveTo(0, -56, 60, 0);
+          ctx.quadraticCurveTo(0, 56, -60, 0);
+          ctx.closePath();
+          ctx.stroke();
+          // Fish tail (triangle matches red outline)
+          ctx.beginPath();
+          ctx.moveTo(60, 0);
+          ctx.lineTo(100, -30);
+          ctx.lineTo(100, 30);
+          ctx.lineTo(60, 0);
+          ctx.closePath();
+          ctx.stroke();
+          // Fish eye (shift downward into body to match red dot in image)
+          ctx.beginPath();
+          ctx.arc(-36, 0, 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+          ctx.restore();
+          break;
+        case 'Horizontal Line':
+          ctx.beginPath();
+          ctx.moveTo(-60, 0); ctx.lineTo(60, 0); ctx.stroke(); break;
+        case 'Vertical Line':
+          ctx.beginPath();
+          ctx.moveTo(0, -60); ctx.lineTo(0, 60); ctx.stroke(); break;
+        case 'Slanting Line':
+          ctx.beginPath();
+          ctx.moveTo(-60, 60); ctx.lineTo(60, -60); ctx.stroke(); break;
+        case 'Square':
+          ctx.beginPath();
+          ctx.rect(-50, -50, 100, 100); ctx.stroke(); break;
+        case 'Rectangle':
+          ctx.beginPath();
+          ctx.rect(-70, -40, 140, 80); ctx.stroke(); break;
+        case 'Circle':
+          ctx.beginPath();
+          ctx.arc(0, 0, 60, 0, Math.PI * 2); ctx.stroke(); break;
+        case 'Sun':
+          ctx.save();
+          // Match line width to other stencils
+          ctx.lineWidth = 10;
+          ctx.strokeStyle = 'white';
+          // Center circle radius matches other stencils
+          const baseRadius = 40;
+          // Ray lengths and angles to match icon
+          const rayAngles = [0, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, 5*Math.PI/4, 3*Math.PI/2, 7*Math.PI/4];
+          const rayInner = baseRadius + 10;
+          const rayOuter = baseRadius + 30;
+          // Draw center circle
+          ctx.beginPath();
+          ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
+          ctx.stroke();
+          // Draw rays
+          for (let i = 0; i < rayAngles.length; i++) {
+            const angle = rayAngles[i];
+            const x1 = Math.cos(angle) * rayInner;
+            const y1 = Math.sin(angle) * rayInner;
+            const x2 = Math.cos(angle) * rayOuter;
+            const y2 = Math.sin(angle) * rayOuter;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          }
+          ctx.restore();
+          break;
+        case 'Hexagon':
+          ctx.beginPath();
+          for(let i=0;i<6;i++){
+            let angle = (Math.PI*2/6)*i - Math.PI/2;
+            let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          } ctx.closePath(); ctx.stroke(); break;
+        case 'Octagon':
+          ctx.beginPath();
+          for(let i=0;i<8;i++){
+            let angle = (Math.PI*2/8)*i - Math.PI/2;
+            let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          } ctx.closePath(); ctx.stroke(); break;
+        case 'Star':
+          ctx.beginPath();
+          for(let i=0;i<10;i++){
+            let angle = (Math.PI/5)*i - Math.PI/2;
+            let r = i%2===0?60:25;
+            let x = Math.cos(angle)*r, y = Math.sin(angle)*r;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          } ctx.closePath(); ctx.stroke(); break;
+        case 'Heart':
+          ctx.beginPath();
+          ctx.moveTo(0, 40); // Bottom point
+          ctx.bezierCurveTo(-60, 10, -30, -60, 0, -10); // Left top curve
+          ctx.bezierCurveTo(30, -60, 60, 10, 0, 40); // Right top curve
+          ctx.closePath();
+          ctx.stroke();
+          break;
+        case 'Smiley':
+          ctx.beginPath();
+          ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(-20, -15, 7, 0, Math.PI*2); ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(20, -15, 7, 0, Math.PI*2); ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 20, 22, Math.PI*0.15, Math.PI*0.85, false); ctx.stroke();
+          break;
       }
-      ctx.restore();
-      break;
-    case 'Hexagon':
-      ctx.beginPath();
-      for(let i=0;i<6;i++){
-        let angle = (Math.PI*2/6)*i - Math.PI/2;
-        let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      } ctx.closePath(); ctx.stroke(); break;
-    case 'Octagon':
-      ctx.beginPath();
-      for(let i=0;i<8;i++){
-        let angle = (Math.PI*2/8)*i - Math.PI/2;
-        let x = Math.cos(angle)*60, y = Math.sin(angle)*60;
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      } ctx.closePath(); ctx.stroke(); break;
-    case 'Star':
-      ctx.beginPath();
-      for(let i=0;i<10;i++){
-        let angle = (Math.PI/5)*i - Math.PI/2;
-        let r = i%2===0?60:25;
-        let x = Math.cos(angle)*r, y = Math.sin(angle)*r;
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      } ctx.closePath(); ctx.stroke(); break;
-    case 'Heart':
-      ctx.beginPath();
-      ctx.moveTo(0, 40); // Bottom point
-      ctx.bezierCurveTo(-60, 10, -30, -60, 0, -10); // Left top curve
-      ctx.bezierCurveTo(30, -60, 60, 10, 0, 40); // Right top curve
-      ctx.closePath();
-      ctx.stroke();
-      break;
-    case 'Smiley':
-      ctx.beginPath();
-      ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(-20, -15, 7, 0, Math.PI*2); ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(20, -15, 7, 0, Math.PI*2); ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(0, 20, 22, Math.PI*0.15, Math.PI*0.85, false); ctx.stroke();
-      break;
-    // ...existing code...
-  }
-}
+    }
   </script>
 </body>
 </html>
