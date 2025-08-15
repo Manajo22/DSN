@@ -1294,18 +1294,16 @@ canvas {
 
     // Initialize audio context on first user interaction
     async function initAudio() {
-      if (!audioInitialized) {
-        try {
-          await Tone.start();
-          if (Tone.context && Tone.context.state === 'suspended') {
-            await Tone.context.resume();
-          }
-          synth = new Tone.AMSynth().toDestination();
-          audioInitialized = true;
-          console.log('Audio initialized successfully');
-        } catch (error) {
-          console.log('Audio initialization failed:', error);
+      try {
+        await Tone.start();
+        if (Tone.context && Tone.context.state === 'suspended') {
+          await Tone.context.resume();
         }
+        synth = new Tone.AMSynth().toDestination();
+        audioInitialized = true;
+        console.log('Audio initialized successfully');
+      } catch (error) {
+        console.log('Audio initialization failed:', error);
       }
     }
 
