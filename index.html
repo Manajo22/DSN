@@ -862,26 +862,41 @@ canvas {
 
   <script>
     // --- Tone.js mobile audio unlock ---
-document.addEventListener('touchstart', async function unlockAudio() {
-  if (window.Tone && Tone.context && Tone.context.state === 'suspended') {
-    await Tone.start();
-    const buffer = Tone.context.createBuffer(1, 1, 22050);
-    const source = Tone.context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(Tone.context.destination);
-    source.start(0);
+// --- Enhanced Tone.js mobile audio unlock ---
+let audioUnlocked = false;
+let pendingAudioInit = false;
+
+async function unlockAudio() {
+  if (audioUnlocked || pendingAudioInit) return;
+  pendingAudioInit = true;
+  
+  try {
+    if (window.Tone && Tone.context) {
+      if (Tone.context.state === 'suspended') {
+        await Tone.start();
+      }
+      
+      // Create a silent buffer to fully unlock audio
+      const buffer = Tone.context.createBuffer(1, 1, 22050);
+      const source = Tone.context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(Tone.context.destination);
+      source.start(0);
+      
+      audioUnlocked = true;
+      console.log('Audio unlocked successfully');
+    }
+  } catch (error) {
+    console.log('Audio unlock failed:', error);
   }
-}, { once: true });
-document.addEventListener('click', async function unlockAudio() {
-  if (window.Tone && Tone.context && Tone.context.state === 'suspended') {
-    await Tone.start();
-    const buffer = Tone.context.createBuffer(1, 1, 22050);
-    const source = Tone.context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(Tone.context.destination);
-    source.start(0);
-  }
-}, { once: true });
+  pendingAudioInit = false;
+}
+
+// Multiple event listeners for better mobile compatibility
+document.addEventListener('touchstart', unlockAudio, { once: true });
+document.addEventListener('touchend', unlockAudio, { once: true });
+document.addEventListener('click', unlockAudio, { once: true });
+document.addEventListener('keydown', unlockAudio, { once: true });
 // Gujarati letters, vowels, numerals
     const gujaratiConsonants = [
       'ક','ખ','ગ','ઘ','ઙ','ચ','છ','જ','ઝ','ઞ','ટ','ઠ',
@@ -1309,20 +1324,60 @@ document.addEventListener('click', async function unlockAudio() {
     ];
 
     // Initialize audio context on first user interaction
-    async function initAudio() {
+    // Initialize audio context on first user interaction
+async function initAudio() {
+  if (audioInitialized) return;
+  
+  try {
+    // Ensure audio context is unlocked first
+    await unlockAudio();
+    
+    if (!window.Tone) {
+      console.log('Tone.js not loaded');
+      return;
+    }
+    
+    // Start Tone.js context
+    if (Tone.context.state === 'suspended') {
+      await Tone.start();
+    }
+    
+    // Recreate synth to ensure it's properly connected
+    if (synth) {
+      synth.dispose();
+    }
+    synth = new Tone.AMSynth().toDestination();
+    
+    audioInitialized = true;
+    console.log('Audio initialized successfully');
+    
+    // Hide enable sound button if it exists
+    const enableBtn = document.getElementById('enableSoundBtn');
+    if (enableBtn) {
+      enableBtn.style.display = 'none';
+    }
+    
+  } catch (error) {
+    console.log('Audio initialization failed:', error);
+    // Show enable sound button as fallback
+    showEnableSoundButton();
+  }
+
+}function showEnableSoundButton() {
+  const enableBtn = document.getElementById('enableSoundBtn');
+  if (enableBtn) {
+    enableBtn.style.display = 'block';
+    enableBtn.onclick = async () => {
       try {
         await Tone.start();
-        if (Tone.context && Tone.context.state === 'suspended') {
-          await Tone.context.resume();
-        }
-        synth = new Tone.AMSynth().toDestination();
-        audioInitialized = true;
-        console.log('Audio initialized successfully');
+        await initAudio();
+        enableBtn.style.display = 'none';
       } catch (error) {
-        console.log('Audio initialization failed:', error);
+        console.log('Manual audio enable failed:', error);
       }
-    }
-
+    };
+  }
+}
     function shuffleArray(array) {
       const shuffled = [...array];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1378,62 +1433,170 @@ document.addEventListener('click', async function unlockAudio() {
     }
 
     function captureCanvas() {
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  
+  tempCanvas.width = colorCanvas.width;
+  tempCanvas.height = colorCanvas.height;
+  
+  // Always draw the background first
+  if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+    tempCtx.drawImage(backgroundImage, 0, 0, tempCanvas.width, tempCanvas.height);
+  } else {
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+  }
+  
+  // Draw only the colored strokes (transparent where erased)
+  tempCtx.drawImage(colorCanvas, 0, 0);
+  
+  // Overlay stencil/A mode if active
+  if ((isAMode || isStencilMode) && aOverlay.style.display !== 'none') {
+    tempCtx.drawImage(aOverlay, 0, 0);
+  }
+  
+  const now = new Date();
+  const timestamp = now.getFullYear() + 
+    String(now.getMonth() + 1).padStart(2, '0') + 
+    String(now.getDate()).padStart(2, '0') + '_' +
+    String(now.getHours()).padStart(2, '0') + 
+    String(now.getMinutes()).padStart(2, '0') + 
+    String(now.getSeconds()).padStart(2, '0');
+  
+  // Enhanced mobile save handling
+  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    // Mobile devices - use different approach
+    tempCanvas.toBlob(function(blob) {
+      const url = URL.createObjectURL(blob);
       
-      tempCanvas.width = colorCanvas.width;
-      tempCanvas.height = colorCanvas.height;
-      
-      // Always draw the background first
-      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-        tempCtx.drawImage(backgroundImage, 0, 0, tempCanvas.width, tempCanvas.height);
+      // Try Web Share API first (works on many mobile browsers)
+      if (navigator.share && navigator.canShare && navigator.canShare({files: [new File([blob], `drawing_${timestamp}.png`, {type: 'image/png'})]})) {
+        const file = new File([blob], `drawing_${timestamp}.png`, {type: 'image/png'});
+        navigator.share({
+          files: [file],
+          title: 'My Drawing',
+          text: 'Check out my drawing!'
+        }).catch(error => {
+          console.log('Web Share failed, falling back to image display');
+          showImageForSave(url, timestamp);
+        });
       } else {
-        tempCtx.fillStyle = 'white';
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        showImageForSave(url, timestamp);
       }
-      // Draw only the colored strokes (transparent where erased)
-      tempCtx.drawImage(colorCanvas, 0, 0);
-      // Overlay stencil/A mode if active
-      if ((isAMode || isStencilMode) && aOverlay.style.display !== 'none') {
-        tempCtx.drawImage(aOverlay, 0, 0);
-      }
-      
-      tempCanvas.toBlob(function(blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        
-        const now = new Date();
-        const timestamp = now.getFullYear() + 
-          String(now.getMonth() + 1).padStart(2, '0') + 
-          String(now.getDate()).padStart(2, '0') + '_' +
-          String(now.getHours()).padStart(2, '0') + 
-          String(now.getMinutes()).padStart(2, '0') + 
-          String(now.getSeconds()).padStart(2, '0');
-        
-        link.download = `drawing_${timestamp}.png`;
-        
-        if (navigator.userAgent.match(/iPhone|iPad/)) {
-          const newWindow = window.open();
-          newWindow.document.write(`
-            <img src="${url}" style="max-width:100%; height:auto;">
-            <p>Tap and hold the image above, then select "Save to Photos" or "Save Image"</p>
-          `);
-          newWindow.document.title = `drawing_${timestamp}.png`;
-        } else {
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-        
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-      }, 'image/png', 1.0);
-    }
+    }, 'image/png', 1.0);
+  } else {
+    // Desktop - direct download
+    tempCanvas.toBlob(function(blob) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `drawing_${timestamp}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    }, 'image/png', 1.0);
+  }
 
-    document.getElementById('cameraBtn').onclick = function() {
+}function showImageForSave(url, timestamp) {
+  // Create overlay for image display
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
+  
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.cssText = `
+    max-width: 90%;
+    max-height: 70%;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+  `;
+  
+  const instructions = document.createElement('div');
+  instructions.style.cssText = `
+    color: white;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.4;
+  `;
+  
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    instructions.innerHTML = `
+      <strong>To save your drawing:</strong><br>
+      1. Press and hold the image above<br>
+      2. Tap "Save to Photos" or "Add to Photos"
+    `;
+  } else {
+    instructions.innerHTML = `
+      <strong>To save your drawing:</strong><br>
+      1. Press and hold the image above<br>
+      2. Select "Download image" or "Save image"
+    `;
+  }
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Close';
+  closeBtn.style.cssText = `
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+  `;
+  
+  closeBtn.onclick = () => {
+    document.body.removeChild(overlay);
+    URL.revokeObjectURL(url);
+  };
+  
+  overlay.appendChild(img);
+  overlay.appendChild(instructions);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+  
+  // Auto-close after 30 seconds
+  setTimeout(() => {
+    if (document.body.contains(overlay)) {
+      document.body.removeChild(overlay);
+      URL.revokeObjectURL(url);
+    }
+  }, 30000);
+}
+   document.getElementById('cameraBtn').onclick = function(e) {
+  e.preventDefault();
   console.log('cameraBtn clicked');
   captureCanvas();
-    };
+};
+
+// Also add touch event for better mobile support
+document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  console.log('cameraBtn touched');
+  captureCanvas();
+});
 
     function getColorAtPixel(x, y) {
       const pixel = ctx.getImageData(x, y, 1, 1).data;
@@ -1944,7 +2107,20 @@ document.addEventListener('click', async function unlockAudio() {
 
     // Set initial color selection
     setColor('rgb(255, 0, 221)', document.querySelector('.dropdown-item.pink'));
+// Initialize audio on page load for better mobile support
+window.addEventListener('DOMContentLoaded', () => {
+  // Show enable sound button initially on mobile
+  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    setTimeout(showEnableSoundButton, 1000);
+  }
+});
 
+// Add visibility change listener to reinitialize audio when page becomes visible
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && audioInitialized && synth && Tone.context.state === 'suspended') {
+    Tone.start().catch(console.error);
+  }
+});
     const shapesList = [
       {name:'Horizontal Line',svg:'<svg width="40" height="40"><line x1="5" y1="20" x2="35" y2="20" stroke="#222" stroke-width="4"/></svg>'},
       {name:'Vertical Line',svg:'<svg width="40" height="40"><line x1="20" y1="5" x2="20" y2="35" stroke="#222" stroke-width="4"/></svg>'},
