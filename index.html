@@ -861,7 +861,28 @@ canvas {
   <button id="enableSoundBtn" style="display:none;position:fixed;top:60px;right:20px;z-index:2000;padding:12px 24px;font-size:1.2rem;background:#ffb700;color:white;border-radius:12px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);">Enable Sound</button>
 
   <script>
-    // Gujarati letters, vowels, numerals
+    // --- Tone.js mobile audio unlock ---
+document.addEventListener('touchstart', async function unlockAudio() {
+  if (window.Tone && Tone.context && Tone.context.state === 'suspended') {
+    await Tone.start();
+    const buffer = Tone.context.createBuffer(1, 1, 22050);
+    const source = Tone.context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(Tone.context.destination);
+    source.start(0);
+  }
+}, { once: true });
+document.addEventListener('click', async function unlockAudio() {
+  if (window.Tone && Tone.context && Tone.context.state === 'suspended') {
+    await Tone.start();
+    const buffer = Tone.context.createBuffer(1, 1, 22050);
+    const source = Tone.context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(Tone.context.destination);
+    source.start(0);
+  }
+}, { once: true });
+// Gujarati letters, vowels, numerals
     const gujaratiConsonants = [
       'ક','ખ','ગ','ઘ','ઙ','ચ','છ','જ','ઝ','ઞ','ટ','ઠ',
       'ડ','ઢ','ણ','ત','થ','દ','ધ','ન','પ','ફ','બ','ભ',
