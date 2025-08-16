@@ -1072,20 +1072,15 @@ canvas {
     // Detect touch device
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
       isTouchDevice = true;
-      // Show enable sound button if context is suspended
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-          if (Tone.context && Tone.context.state === 'suspended') {
-            document.getElementById('enableSoundBtn').style.display = 'block';
-          }
-        }, 500);
-      });
-      document.getElementById('enableSoundBtn').addEventListener('click', async function() {
+      // Always resume audio context and recreate synth on first user gesture for mobile
+      const resumeAudio = async () => {
         if (Tone.context && Tone.context.state === 'suspended') {
           await Tone.context.resume();
+          synth = new Tone.AMSynth().toDestination();
         }
-        this.style.display = 'none';
-      });
+      };
+      window.addEventListener('touchstart', resumeAudio, { once: true });
+      window.addEventListener('click', resumeAudio, { once: true });
     }
 
     // Create letter grid
