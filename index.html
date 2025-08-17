@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Draw with music!</title>
   <link rel="stylesheet" href="https://use.typekit.net/xvl8ddx.css">
-  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.39/build/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
   <style>
 /* Unify stencil button size and spacing for shapes grid */
 .shapes-item {
@@ -327,8 +327,8 @@ canvas {
 }
 
 #shapesBtn {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: #000000;
+  color: #000000;
   border: 2px solid #999;
 }
 
@@ -800,7 +800,12 @@ canvas {
     <button id="aBtn">A/a</button>
     <button id="gujaratiBtn">ક</button>
     <button id="shapesBtn">
-      <span style="display:inline-block;width:1.5em;height:1.5em;border-radius:50%;background:#222;border:2px solid #fff;"></span>
+      <span style="display:inline-block;width:2.5em;height: 2.5em;background:#000;border-radius:50%;position:relative;">
+        <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;top:0;left:0;">
+          <circle cx="20" cy="20" r="16" stroke="#fff" stroke-width="3" fill="none" />
+          <circle cx="20" cy="20" r="10" fill="#000" stroke="none" />
+        </svg>
+      </span>
     </button>
     
     <!-- VERTICAL DROPDOWN MENU - NO TITLES -->
@@ -859,6 +864,85 @@ canvas {
   <canvas id="aOverlay"></canvas>
   <button id="stencilCloseBtn"></button>
   <button id="enableSoundBtn" style="display:none;position:fixed;top:60px;right:20px;z-index:2000;padding:12px 24px;font-size:1.2rem;background:#ffb700;color:white;border-radius:12px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);">Enable Sound</button>
+  <script>
+// --- Robust Tone.js mobile audio unlock/init ---
+const enableSoundBtn = document.getElementById('enableSoundBtn');
+let audioInitialized = false;
+let synth = null;
+
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+}
+
+function showEnableSoundBtn() {
+  enableSoundBtn.style.display = 'block';
+}
+function hideEnableSoundBtn() {
+  enableSoundBtn.style.display = 'none';
+}
+
+async function unlockAudioContext() {
+  if (!window.Tone || !Tone.context) return false;
+  try {
+    if (Tone.context.state === 'suspended') {
+      await Tone.start();
+    }
+    // Silent buffer unlock
+    const buffer = Tone.context.createBuffer(1, 1, 22050);
+    const source = Tone.context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(Tone.context.destination);
+    source.start(0);
+    // Oscillator unlock
+    const osc = Tone.context.createOscillator();
+    osc.connect(Tone.context.destination);
+    osc.start(); osc.stop();
+    return true;
+  } catch (e) {
+    console.warn('Audio unlock failed:', e);
+    return false;
+  }
+}
+
+async function initAudio(retries = 3) {
+  if (audioInitialized) return;
+  let unlocked = false;
+  for (let i = 0; i < retries; i++) {
+    unlocked = await unlockAudioContext();
+    if (unlocked) break;
+    await new Promise(res => setTimeout(res, 200));
+  }
+  if (unlocked) {
+    synth = new Tone.AMSynth().toDestination();
+    audioInitialized = true;
+    hideEnableSoundBtn();
+    console.log('Audio initialized');
+  } else {
+    showEnableSoundBtn();
+    console.warn('Audio not initialized, user action required');
+  }
+}
+
+// Show button on mobile if not initialized
+if (isMobileDevice()) {
+  showEnableSoundBtn();
+}
+
+// Button click/touch triggers audio init
+enableSoundBtn.addEventListener('click', () => initAudio(5));
+enableSoundBtn.addEventListener('touchend', () => initAudio(5));
+
+// Multiple event listeners for cross-browser unlock
+['touchstart','touchend','mousedown','keydown','click'].forEach(evt => {
+  window.addEventListener(evt, () => initAudio(3), { once: true });
+});
+
+// Optionally, call initAudio on app start for desktop
+if (!isMobileDevice()) {
+  setTimeout(() => initAudio(2), 500);
+}
+// --- End robust Tone.js unlock/init ---
+  </script>
 
   <script>
     // --- Tone.js mobile audio unlock ---
@@ -1098,7 +1182,6 @@ document.addEventListener('keydown', unlockAudio, { once: true });
     const ctx = colorCanvas.getContext('2d');
     const aCtx = aOverlay.getContext('2d');
     const backgroundImage = new Image();
-    let audioInitialized = false;
     let isTouchDevice = false;
     let isAMode = false;
     let aImage = null;
@@ -1302,7 +1385,6 @@ document.addEventListener('keydown', unlockAudio, { once: true });
     let eraserMoving = false;
     let eraserPath = [];
 
-    let synth;
     let currentNote = null;
     let noteScheduler = null;
     let playingNotes = new Set();
