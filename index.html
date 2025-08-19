@@ -900,47 +900,12 @@ canvas {
   <button id="enableSoundBtn">🎵 Enable Sound</button>
 
   <script>
-// Place this RIGHT AFTER line 71 (after the audio system comment)
-// Replace the entire audio section (lines 72-185) with this:
-
-// --- ROBUST MOBILE AUDIO SYSTEM WITH IPHONE SAFARI FIX ---
+// --- ROBUST MOBILE AUDIO SYSTEM ---
 let audioInitialized = false;
 let audioUnlocked = false;
 let pendingAudioInit = false;
 let synth = null;
 const enableSoundBtn = document.getElementById('enableSoundBtn');
-
-// iPhone Safari Audio Unlock - CRITICAL: Must be before initAudio()
-let iphoneUnlockAttempted = false;
-
-// One-time iPhone Safari unlock on first gesture
-function unlockIphoneSafariAudio() {
-  if (iphoneUnlockAttempted) return;
-  
-  // Only run on iPhone Safari specifically
-  const isIphoneSafari = /iPhone/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
-  if (!isIphoneSafari) return;
-  
-  iphoneUnlockAttempted = true;
-  
-  // Immediate Tone.start() call within the gesture event
-  if (window.Tone && Tone.context) {
-    Tone.start().then(() => {
-      console.log('iPhone Safari audio context unlocked via gesture');
-    }).catch(error => {
-      console.warn('iPhone Safari audio unlock failed:', error);
-    });
-  }
-}
-
-// Attach the unlock to the very first user gesture
-['touchstart', 'pointerdown', 'click'].forEach(eventType => {
-  document.addEventListener(eventType, unlockIphoneSafariAudio, { 
-    once: true, 
-    passive: true,
-    capture: true // Ensure we catch it early
-  });
-});
 
 // Device detection
 function isMobileDevice() {
@@ -958,7 +923,7 @@ function hideEnableSoundBtn() {
   console.log('Hiding enable sound button');
 }
 
-// Enhanced unlockAudioContext function with iPhone Safari support
+// Comprehensive audio context unlock
 async function unlockAudioContext() {
   if (audioUnlocked || pendingAudioInit) return true;
   
@@ -971,11 +936,8 @@ async function unlockAudioContext() {
       return false;
     }
 
-    // iPhone Safari: Always call Tone.start() if context is suspended
-    if (/iPhone/.test(navigator.userAgent) && Tone.context.state === 'suspended') {
-      await Tone.start();
-      console.log('iPhone Safari: Tone.js context started in unlock');
-    } else if (Tone.context.state === 'suspended') {
+    // Start Tone.js context if suspended
+    if (Tone.context.state === 'suspended') {
       await Tone.start();
       console.log('Tone.js context started');
     }
@@ -1005,7 +967,7 @@ async function unlockAudioContext() {
   }
 }
 
-// Initialize audio with retry mechanism and iPhone Safari support
+// Initialize audio with retry mechanism
 async function initAudio(retries = 5) {
   if (audioInitialized) {
     console.log('Audio already initialized');
@@ -1030,15 +992,6 @@ async function initAudio(retries = 5) {
   }
   
   try {
-    // iPhone Safari specific: Extra Tone.start() call during initialization
-    // This works with the gesture unlock above to ensure context is fully ready
-    if (/iPhone/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent)) {
-      if (Tone.context && Tone.context.state === 'suspended') {
-        await Tone.start();
-        console.log('iPhone Safari: Additional Tone.start() during init');
-      }
-    }
-    
     // Create synth after successful unlock
     if (synth) {
       synth.dispose();
@@ -1047,6 +1000,14 @@ async function initAudio(retries = 5) {
     
     audioInitialized = true;
     hideEnableSoundBtn();
+    // Play test beep (C4, then E4) to confirm audio
+    try {
+      await Tone.start();
+      synth.triggerAttackRelease('C4', '8n');
+      setTimeout(() => synth.triggerAttackRelease('E4', '8n'), 350);
+    } catch (err) {
+      console.warn('Test beep failed:', err);
+    }
     console.log('Audio initialization complete');
     return true;
     
