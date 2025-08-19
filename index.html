@@ -38,12 +38,13 @@
   align-items: center;
 }
 
-  @font-face {
-    font-family: 'Gopika';
-    src: url('https://cdn.jsdelivr.net/gh/gujaratilexicon/fonts@master/fonts/gopika/Gopika.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+@font-face {
+  font-family: 'Gopika';
+  src: url('https://cdn.jsdelivr.net/gh/gujaratilexicon/fonts@master/fonts/gopika/Gopika.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* Gujarati button styles */
 .gujarati-button {
   background-color: #000;
@@ -62,6 +63,7 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
+
 .gujarati-button:hover {
   background-color: #222;
   border-color: #ffb700;
@@ -79,6 +81,7 @@
   align-items: center;
   z-index: 1000 !important;
 }
+
 #gujaratiGrid {
   background: white;
   border-radius: 20px;
@@ -91,6 +94,7 @@
   gap: 10px;
   position: relative;
 }
+
 .gujarati-item {
   width: clamp(60px, 8vw, 80px);
   height: clamp(60px, 8vw, 80px);
@@ -107,11 +111,13 @@
   color: #222;
   font-family: 'Gopika', 'Noto Sans Gujarati', sans-serif !important;
 }
+
 .gujarati-item:hover {
   transform: scale(1.1);
   border-color: #ffb700;
   background: #fff7e0;
 }
+
 #closeGujaratiGrid {
   position: fixed;
   top: 20px;
@@ -180,16 +186,18 @@
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
-    @font-face {
-      font-family: "CLT Apfel Grotezk";
-      src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
-    }
-    @font-face {
-      font-family: "Comic Sans MS";
-      src: url("data:font/woff;base64,d09GRgABAAAAAAw0ABAAAAAAQ8gAA...TRUNCATED_BASE64...AA==") format("woff"), local("Comic Sans MS"), local("Comic Sans"), url("https://fonts.cdnfonts.com/s/14617/Comic_Sans_MS.woff") format("woff");
-      font-style: normal;
-      font-weight: normal;
-    }
+
+@font-face {
+  font-family: "CLT Apfel Grotezk";
+  src: url("CLT Apfel Grotezk/web/ApfelGrotezk-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Comic Sans MS";
+  src: url("data:font/woff;base64,d09GRgABAAAAAAw0ABAAAAAAQ8gAA...TRUNCATED_BASE64...AA==") format("woff"), local("Comic Sans MS"), local("Comic Sans"), url("https://fonts.cdnfonts.com/s/14617/Comic_Sans_MS.woff") format("woff");
+  font-style: normal;
+  font-weight: normal;
+}
 
 html, body {
   margin: 0;
@@ -688,6 +696,32 @@ canvas {
   display: none;
 }
 
+/* Enable Sound Button - prominently positioned */
+#enableSoundBtn {
+  position: fixed;
+  top: 16px;
+  right: 12px;
+  left: auto;
+  transform: none;
+  background: linear-gradient(135deg, #ffb700, #ffb700);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  z-index: 2000;
+  display: none;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
 /* RESPONSIVE ADJUSTMENTS - MAINTAIN EQUAL SIZING */
 @media (max-width: 900px) {
   #buttonContainer {
@@ -849,7 +883,7 @@ canvas {
   <!-- Shapes Grid Modal -->
   <div id="shapesGridModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:1000;">
     <div id="shapesGrid" style="background:white;border-radius:22px;padding:40px 20px 20px 20px;max-width:90vw;max-height:80vh;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;">
-  <button id="closeShapesGrid" style="position:fixed;top:20px;right:20px;width:40px;height:40px;border:none;background:#ffb700;color:white;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1001;">✕</button>
+      <button id="closeShapesGrid" style="position:fixed;top:20px;right:20px;width:40px;height:40px;border:none;background:#ffb700;color:white;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1001;">✕</button>
       <!-- Shape buttons will be injected here -->
     </div>
   </div>
@@ -857,664 +891,659 @@ canvas {
   <!-- A Mode Cancel Button -->
   <button id="aCancelBtn">✕</button>
 
-  <button id="mainResetBtn" style="font-size:1.1rem;width:90px;height:44px;border-radius:15px;margin:12px;background:linear-gradient(90deg,#ff179e,#9855fe,#45a0fc);color:black;border:none;display:flex;align-items:center;justify-content:center;">Reset</button>
-  <button id="cameraBtn" style="font-size:1.1rem;width:90px;height:44px;border-radius:15px;margin:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;display:flex;align-items:center;justify-content:center;">Save</button>
+  <button id="mainResetBtn">Reset</button>
+  <button id="cameraBtn">Save</button>
   <canvas id="colorCanvas"></canvas>
   <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
   <canvas id="aOverlay"></canvas>
   <button id="stencilCloseBtn"></button>
-  <button id="enableSoundBtn" style="display:none;position:fixed;top:60px;right:20px;z-index:2000;padding:12px 24px;font-size:1.2rem;background:#ffb700;color:white;border-radius:12px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);">Enable Sound</button>
-  <script>
-// --- Robust Tone.js mobile audio unlock/init ---
-const enableSoundBtn = document.getElementById('enableSoundBtn');
-let audioInitialized = false;
-let synth = null;
+  <button id="enableSoundBtn">🎵 Enable Sound</button>
 
+  <script>
+// --- ROBUST MOBILE AUDIO SYSTEM ---
+let audioInitialized = false;
+let audioUnlocked = false;
+let pendingAudioInit = false;
+let synth = null;
+const enableSoundBtn = document.getElementById('enableSoundBtn');
+
+// Device detection
 function isMobileDevice() {
   return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
 }
 
+// Show/Hide enable sound button
 function showEnableSoundBtn() {
   enableSoundBtn.style.display = 'block';
-}
-function hideEnableSoundBtn() {
-  enableSoundBtn.style.display = 'none';
+  console.log('Showing enable sound button');
 }
 
+function hideEnableSoundBtn() {
+  enableSoundBtn.style.display = 'none';
+  console.log('Hiding enable sound button');
+}
+
+// Comprehensive audio context unlock
 async function unlockAudioContext() {
-  if (!window.Tone || !Tone.context) return false;
+  if (audioUnlocked || pendingAudioInit) return true;
+  
+  pendingAudioInit = true;
+  console.log('Attempting to unlock audio context...');
+  
   try {
+    if (!window.Tone || !Tone.context) {
+      console.log('Tone.js not available');
+      return false;
+    }
+
+    // Start Tone.js context if suspended
     if (Tone.context.state === 'suspended') {
       await Tone.start();
+      console.log('Tone.js context started');
     }
-    // Silent buffer unlock
+    
+    // Create silent buffer to fully unlock
     const buffer = Tone.context.createBuffer(1, 1, 22050);
     const source = Tone.context.createBufferSource();
     source.buffer = buffer;
     source.connect(Tone.context.destination);
     source.start(0);
-    // Oscillator unlock
+    
+    // Create oscillator for additional unlock
     const osc = Tone.context.createOscillator();
     osc.connect(Tone.context.destination);
-    osc.start(); osc.stop();
+    osc.start(0);
+    osc.stop(0.01);
+    
+    audioUnlocked = true;
+    console.log('Audio context unlocked successfully');
     return true;
-  } catch (e) {
-    console.warn('Audio unlock failed:', e);
+    
+  } catch (error) {
+    console.warn('Audio unlock failed:', error);
+    return false;
+  } finally {
+    pendingAudioInit = false;
+  }
+}
+
+// Initialize audio with retry mechanism
+async function initAudio(retries = 5) {
+  if (audioInitialized) {
+    console.log('Audio already initialized');
+    return true;
+  }
+  
+  console.log('Initializing audio...');
+  
+  // First unlock the audio context
+  let unlocked = false;
+  for (let i = 0; i < retries && !unlocked; i++) {
+    unlocked = await unlockAudioContext();
+    if (!unlocked) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+  }
+  
+  if (!unlocked) {
+    console.log('Audio unlock failed, showing enable button');
+    showEnableSoundBtn();
     return false;
   }
-}
-
-async function initAudio(retries = 3) {
-  if (audioInitialized) return;
-  let unlocked = false;
-  for (let i = 0; i < retries; i++) {
-    unlocked = await unlockAudioContext();
-    if (unlocked) break;
-    await new Promise(res => setTimeout(res, 200));
-  }
-  if (unlocked) {
-    synth = new Tone.AMSynth().toDestination();
-    audioInitialized = true;
-    hideEnableSoundBtn();
-    console.log('Audio initialized');
-  } else {
-    showEnableSoundBtn();
-    console.warn('Audio not initialized, user action required');
-  }
-}
-
-// Show button on mobile if not initialized
-if (isMobileDevice()) {
-  showEnableSoundBtn();
-}
-
-// Button click/touch triggers audio init
-enableSoundBtn.addEventListener('click', () => initAudio(5));
-enableSoundBtn.addEventListener('touchend', () => initAudio(5));
-
-// Multiple event listeners for cross-browser unlock
-['touchstart','touchend','mousedown','keydown','click'].forEach(evt => {
-  window.addEventListener(evt, () => initAudio(3), { once: true });
-});
-
-// Optionally, call initAudio on app start for desktop
-if (!isMobileDevice()) {
-  setTimeout(() => initAudio(2), 500);
-}
-// --- End robust Tone.js unlock/init ---
-  </script>
-
-  <script>
-    // --- Tone.js mobile audio unlock ---
-// --- Enhanced Tone.js mobile audio unlock ---
-let audioUnlocked = false;
-let pendingAudioInit = false;
-
-async function unlockAudio() {
-  if (audioUnlocked || pendingAudioInit) return;
-  pendingAudioInit = true;
   
   try {
-    if (window.Tone && Tone.context) {
-      if (Tone.context.state === 'suspended') {
-        await Tone.start();
-      }
-      
-      // Create a silent buffer to fully unlock audio
-      const buffer = Tone.context.createBuffer(1, 1, 22050);
-      const source = Tone.context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(Tone.context.destination);
-      source.start(0);
-      
-      audioUnlocked = true;
-      console.log('Audio unlocked successfully');
-    }
-  } catch (error) {
-    console.log('Audio unlock failed:', error);
-  }
-  pendingAudioInit = false;
-}
-
-// Multiple event listeners for better mobile compatibility
-document.addEventListener('touchstart', unlockAudio, { once: true });
-document.addEventListener('touchend', unlockAudio, { once: true });
-document.addEventListener('click', unlockAudio, { once: true });
-document.addEventListener('keydown', unlockAudio, { once: true });
-// Gujarati letters, vowels, numerals
-    const gujaratiConsonants = [
-      'ક','ખ','ગ','ઘ','ઙ','ચ','છ','જ','ઝ','ઞ','ટ','ઠ',
-      'ડ','ઢ','ણ','ત','થ','દ','ધ','ન','પ','ફ','બ','ભ',
-      'મ','ય','ર','લ','વ','શ','ષ','સ','હ','ળ','ક્ષ','ત્ર'
-    ];
-    const gujaratiVowels = ['અ','આ','ઇ','ઈ','ઉ','ઊ','એ','ઐ','ઓ','ઔ','અં','અઃ'];
-    const gujaratiNumerals = ['૦','૧','૨','૩','૪','૫','૬','૭','૮','૯'];
-
-    // Show Gujarati grid modal (only one grid open at a time)
-    document.getElementById('gujaratiBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('letterGridModal').style.display = 'none';
-      createGujaratiGrid();
-      document.getElementById('gujaratiGridModal').style.display = 'flex';
-    });
-    document.getElementById('gujaratiBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('letterGridModal').style.display = 'none';
-      createGujaratiGrid();
-      document.getElementById('gujaratiGridModal').style.display = 'flex';
-    });
-
-    // Show A/a grid modal (only one grid open at a time)
-    document.getElementById('aBtn').addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('gujaratiGridModal').style.display = 'none';
-      document.getElementById('letterGridModal').style.display = 'flex';
-    });
-    document.getElementById('aBtn').addEventListener('touchend', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('gujaratiGridModal').style.display = 'none';
-      document.getElementById('letterGridModal').style.display = 'flex';
-    });
-
-    // Close Gujarati grid
-    document.getElementById('closeGujaratiGrid').addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      document.getElementById('gujaratiGridModal').style.display = 'none';
-    });
-
-    // Create Gujarati grid
-    function createGujaratiGrid() {
-      const gujaratiGrid = document.getElementById('gujaratiGrid');
-      const closeBtn = document.getElementById('closeGujaratiGrid');
-      gujaratiGrid.innerHTML = '';
-      gujaratiGrid.appendChild(closeBtn);
-      // Consonants
-      gujaratiConsonants.forEach(char => {
-        const item = document.createElement('button');
-        item.className = 'gujarati-item';
-        item.textContent = char;
-        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
-        gujaratiGrid.appendChild(item);
-      });
-      // Vowels
-      gujaratiVowels.forEach(char => {
-        const item = document.createElement('button');
-        item.className = 'gujarati-item';
-        item.textContent = char;
-        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
-        gujaratiGrid.appendChild(item);
-      });
-      // Numerals
-      gujaratiNumerals.forEach(char => {
-        const item = document.createElement('button');
-        item.className = 'gujarati-item';
-        item.textContent = char;
-        item.addEventListener('click', () => showGujaratiStencilOverlay(char));
-        gujaratiGrid.appendChild(item);
-      });
-    }
-
-    // Show Gujarati stencil overlay
-    function showGujaratiStencilOverlay(char) {
-      isStencilMode = true;
-      selectedLetter = char;
-      document.getElementById('gujaratiGridModal').style.display = 'none';
-      drawGujaratiStencilOverlay(char);
-      stencilCloseBtn.style.display = 'flex';
-      aOverlay.style.display = 'block';
-      document.getElementById('buttonContainer').style.zIndex = 40;
-      document.getElementById('mainResetBtn').style.zIndex = 40;
-      document.getElementById('cameraBtn').style.zIndex = 40;
-      document.getElementById('title').style.zIndex = 40;
-      document.getElementById('prompt').style.zIndex = 40;
-    }
-
-    // Draw Gujarati stencil overlay
-    function drawGujaratiStencilOverlay(char) {
-      aOverlay.width = window.innerWidth;
-      aOverlay.height = window.innerHeight;
-      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
-      aCtx.globalAlpha = 1.0;
-      aCtx.fillStyle = 'black';
-      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
-      aCtx.save();
-      aCtx.globalCompositeOperation = 'destination-out';
-      let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
-      aCtx.font = `${fontSize}px 'Gopika', 'Noto Sans Gujarati', sans-serif`;
-      aCtx.textAlign = 'center';
-      aCtx.textBaseline = 'middle';
-      aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
-      aCtx.restore();
-      aCtx.globalCompositeOperation = 'source-over';
-    }
-    // --- Digital Stencil Feature ---
-    let isStencilMode = false;
-    const stencilCloseBtn = document.getElementById('stencilCloseBtn');
-
-    // Show stencil overlay with transparent letter/digit
-    function showStencilOverlay(char) {
-      isStencilMode = true;
-      selectedLetter = char;
-      document.getElementById('letterGridModal').style.display = 'none';
-      drawStencilOverlay(char);
-      stencilCloseBtn.style.display = 'flex';
-      aOverlay.style.display = 'block';
-      // Keep dropdown and UI visible
-      document.getElementById('buttonContainer').style.zIndex = 40;
-      document.getElementById('mainResetBtn').style.zIndex = 40;
-      document.getElementById('cameraBtn').style.zIndex = 40;
-      document.getElementById('title').style.zIndex = 40;
-      document.getElementById('prompt').style.zIndex = 40;
-    }
-
-    // Draw stencil overlay: black everywhere, transparent where char is
-    function drawStencilOverlay(char) {
-      aOverlay.width = window.innerWidth;
-      aOverlay.height = window.innerHeight;
-      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
-      // Fill with black
-      aCtx.globalAlpha = 1.0;
-      aCtx.fillStyle = 'black';
-      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
-      // Draw transparent letter/digit
-      aCtx.save();
-      aCtx.globalCompositeOperation = 'destination-out';
-      // Calculate font size and position
-      let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
-      if (char.length > 1) fontSize *= 0.7;
-      aCtx.font = `400 normal ${fontSize}px "comic-sans-ms", sans-serif`;
-      aCtx.textAlign = 'center';
-      aCtx.textBaseline = 'middle';
-      aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
-      aCtx.restore();
-      aCtx.globalCompositeOperation = 'source-over';
-    }
-
-    // Remove stencil overlay
-    function exitStencilMode() {
-      isStencilMode = false;
-      aOverlay.style.display = 'none';
-      stencilCloseBtn.style.display = 'none';
-      // Restore z-indexes
-      document.getElementById('buttonContainer').style.zIndex = 15;
-      document.getElementById('mainResetBtn').style.zIndex = 10;
-      document.getElementById('cameraBtn').style.zIndex = 10;
-      document.getElementById('title').style.zIndex = 10;
-      document.getElementById('prompt').style.zIndex = 20;
-    }
-
-    // When resizing, redraw overlay if stencil mode is active
-    const origResizeCanvasDimensions = resizeCanvasDimensions;
-    resizeCanvasDimensions = function() {
-      colorCanvas.width = aOverlay.width = window.innerWidth;
-      colorCanvas.height = aOverlay.height = window.innerHeight;
-      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
-      } else {
-        createWhiteBackground();
-      }
-      // Redraw A overlay if in A mode
-      if (isAMode && aImage) {
-        drawAOverlay();
-      }
-      // Redraw stencil overlay if active
-      if (isStencilMode && selectedLetter) {
-        drawStencilOverlay(selectedLetter);
-      }
-    }
-
-    // Stencil close button event
-    stencilCloseBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      exitStencilMode();
-    });
-    stencilCloseBtn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      exitStencilMode();
-    });
-    const colorCanvas = document.getElementById('colorCanvas');
-    const aOverlay = document.getElementById('aOverlay');
-    const ctx = colorCanvas.getContext('2d');
-    const aCtx = aOverlay.getContext('2d');
-    const backgroundImage = new Image();
-    let isTouchDevice = false;
-    let isAMode = false;
-    let aImage = null;
-    let selectedLetter = 'A';
-    let selectedButton = null;
-
-    // Detect touch device
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-      isTouchDevice = true;
-      // Always resume audio context and recreate synth on first user gesture for mobile
-      const resumeAudio = async () => {
-        if (Tone.context && Tone.context.state === 'suspended') {
-          await Tone.context.resume();
-          synth = new Tone.AMSynth().toDestination();
-        }
-      };
-      window.addEventListener('touchstart', resumeAudio, { once: true });
-      window.addEventListener('click', resumeAudio, { once: true });
-    }
-
-    // Create letter grid
-    function createLetterGrid() {
-      const letterGrid = document.getElementById('letterGrid');
-      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      const numbers = '0123456789';
-      
-      // Clear existing content except close button
-      const closeBtn = document.getElementById('closeLetterGrid');
-      letterGrid.innerHTML = '';
-      letterGrid.appendChild(closeBtn);
-      
-      // Add letters
-      for (let i = 0; i < letters.length; i++) {
-        const letter = letters[i];
-        const letterItem = document.createElement('button');
-        letterItem.className = 'letter-item';
-        letterItem.textContent = letter + letter.toLowerCase();
-        letterItem.addEventListener('click', () => showStencilOverlay(letter + letter.toLowerCase()));
-        letterGrid.appendChild(letterItem);
-      }
-      // Add numbers
-      for (let i = 0; i < numbers.length; i++) {
-        const number = numbers[i];
-        const numberItem = document.createElement('button');
-        numberItem.className = 'letter-item';
-        numberItem.textContent = number;
-        numberItem.addEventListener('click', () => showStencilOverlay(number));
-        letterGrid.appendChild(numberItem);
-      }
-    }
-
-    function selectLetter(letter) {
-      selectedLetter = letter;
-      document.getElementById('letterGridModal').style.display = 'none';
-      createAImage().then(img => {
-        aImage = img;
-        if (isAMode) {
-          drawAOverlay();
-        }
-      });
-    }
-
-    // Create A image from the selected letter
-    function createAImage() {
-      return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size
-        canvas.width = 1000;
-        canvas.height = 1000;
-        
-        // Fill with transparent
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Create the selected letter/number
-        ctx.fillStyle = 'white';
-        ctx.font = '400 normal 600px "comic-sans-ms", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
-        
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.src = canvas.toDataURL();
-      });
-    }
-
-    // Initialize letter grid and A image
-    createLetterGrid();
-    createAImage().then(img => {
-      aImage = img;
-    });
-
-    // Create a fallback white background
-    function createWhiteBackground() {
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
-    }
-
-    backgroundImage.src = 'white-wall.jpg';
-    backgroundImage.onerror = function() {
-      createWhiteBackground();
-    };
-
-    backgroundImage.onload = function() {
-      ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
-    };
-
-    function resizeCanvasDimensions() {
-      colorCanvas.width = aOverlay.width = window.innerWidth;
-      colorCanvas.height = aOverlay.height = window.innerHeight;
-      
-      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
-      } else {
-        createWhiteBackground();
-      }
-      
-      // Redraw A overlay if in A mode
-      if (isAMode && aImage) {
-        drawAOverlay();
-      }
-    }
-
-    function drawAOverlay() {
-      aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
-      
-      // Fill entire canvas with black
-      aCtx.fillStyle = 'black';
-      aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
-      
-      // Calculate scaling to fit image in canvas while maintaining aspect ratio
-      const scale = Math.min(aOverlay.width / aImage.width, aOverlay.height / aImage.height) * 0.8;
-      const scaledWidth = aImage.width * scale;
-      const scaledHeight = aImage.height * scale;
-      const x = (aOverlay.width - scaledWidth) / 2;
-      const y = (aOverlay.height - scaledHeight) / 2;
-      
-      // Use destination-out to create transparent areas where the letter image is
-      aCtx.globalCompositeOperation = 'destination-out';
-      aCtx.drawImage(aImage, x, y, scaledWidth, scaledHeight);
-      aCtx.globalCompositeOperation = 'source-over';
-    }
-
-    function setSelectedButton(button) {
-      // Remove selection from previous button
-      if (selectedButton) {
-        selectedButton.classList.remove('selected');
-      }
-      
-      // Add selection to new button
-      if (button) {
-        button.classList.add('selected');
-        selectedButton = button;
-      }
-    }
-
-    function setAMode() {
-      initAudio();
-      isAMode = true;
-      isGradientMode = false;
-      isEraserMode = false;
-      aOverlay.style.display = 'block';
-      document.getElementById('aCancelBtn').style.display = 'flex';
-      setSelectedButton(document.getElementById('aBtn'));
-      if (aImage) {
-        drawAOverlay();
-      }
-      console.log('A mode activated with letter:', selectedLetter);
-    }
-
-    function exitAMode() {
-      isAMode = false;
-      aOverlay.style.display = 'none';
-      document.getElementById('aCancelBtn').style.display = 'none';
-      if (selectedButton === document.getElementById('aBtn')) {
-        setSelectedButton(null);
-      }
-    }
-
-    resizeCanvasDimensions();
-    window.addEventListener('resize', resizeCanvasDimensions);
-
-    let painting = false;
-    let currentColor = 'rgb(255, 0, 221)';
-    let isGradientMode = false;
-    let isEraserMode = false;
-    let gradientColors = [];
-    let gradientIndex = 0;
-    let colorTimer = 0;
-    let colorDuration = 500;
-    let lastColorChangeTime = 0;
-    let currentGradientColor = null;
-    let nextGradientColor = null;
-    let colorTransitionProgress = 0;
-    let brushSize = 30;
-    let eraserAudioTimer = 0;
-    let lastPlayedNote = null;
-    let noteChangeThreshold = 80;
-    let eraserMoving = false;
-    let eraserPath = [];
-
-    let currentNote = null;
-    let noteScheduler = null;
-    let playingNotes = new Set();
-
-    const colorNotes = {
-      pink: "C4",
-      purple: "D4",
-      yellow: "E4",
-      orange: "F4",
-      blue: "G4"
-    };
-
-    const colors = [
-      { name: 'pink', rgb: 'rgb(255, 0, 221)', r: 255, g: 0, b: 221 },
-      { name: 'purple', rgb: 'rgb(92, 0, 157)', r: 92, g: 0, b: 157 },
-      { name: 'yellow', rgb: 'rgb(255, 187, 0)', r: 255, g: 187, b: 0 },
-      { name: 'orange', rgb: 'rgb(255, 77, 0)', r: 255, g: 77, b: 0 },
-      { name: 'blue', rgb: 'rgb(125, 244, 255)', r: 125, g: 244, b: 255 }
-    ];
-
-    // Initialize audio context on first user interaction
-    // Initialize audio context on first user interaction
-async function initAudio() {
-  if (audioInitialized) return;
-  
-  try {
-    // Ensure audio context is unlocked first
-    await unlockAudio();
-    
-    if (!window.Tone) {
-      console.log('Tone.js not loaded');
-      return;
-    }
-    
-    // Start Tone.js context
-    if (Tone.context.state === 'suspended') {
-      await Tone.start();
-    }
-    
-    // Recreate synth to ensure it's properly connected
+    // Create synth after successful unlock
     if (synth) {
       synth.dispose();
     }
     synth = new Tone.AMSynth().toDestination();
     
     audioInitialized = true;
-    console.log('Audio initialized successfully');
-    
-    // Hide enable sound button if it exists
-    const enableBtn = document.getElementById('enableSoundBtn');
-    if (enableBtn) {
-      enableBtn.style.display = 'none';
-    }
+    hideEnableSoundBtn();
+    console.log('Audio initialization complete');
+    return true;
     
   } catch (error) {
-    console.log('Audio initialization failed:', error);
-    // Show enable sound button as fallback
-    showEnableSoundButton();
-  }
-
-}function showEnableSoundButton() {
-  const enableBtn = document.getElementById('enableSoundBtn');
-  if (enableBtn) {
-    enableBtn.style.display = 'block';
-    enableBtn.onclick = async () => {
-      try {
-        await Tone.start();
-        await initAudio();
-        enableBtn.style.display = 'none';
-      } catch (error) {
-        console.log('Manual audio enable failed:', error);
-      }
-    };
+    console.error('Synth creation failed:', error);
+    showEnableSoundBtn();
+    return false;
   }
 }
-    function shuffleArray(array) {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    }
 
-    function setColor(color, button) {
-      initAudio();
-      currentColor = color;
-      isGradientMode = false;
-      isEraserMode = false;
-      setSelectedButton(button);
-      console.log('Color set to:', color);
-    }
+// Enable sound button handler
+enableSoundBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  enableSoundBtn.style.display = 'none';
+  console.log('Enable sound button clicked');
+  await initAudio(5);
+});
 
-    function setGradientMode(button) {
-      initAudio();
-      isGradientMode = true;
-      isEraserMode = false;
-      setSelectedButton(button);
-      gradientColors = shuffleArray(colors);
-      gradientIndex = 0;
-      colorTimer = 0;
-      lastColorChangeTime = Date.now();
-      currentGradientColor = gradientColors[0];
-      nextGradientColor = gradientColors[1];
-      colorTransitionProgress = 0;
-      console.log('Gradient mode activated with colors:', gradientColors);
-    }
+enableSoundBtn.addEventListener('touchend', async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  enableSoundBtn.style.display = 'none';
+  console.log('Enable sound button touched');
+  await initAudio(5);
+});
 
-    function setEraserMode(button) {
-      initAudio();
-      isEraserMode = true;
-      isGradientMode = false;
-      setSelectedButton(button);
-      console.log('Eraser mode activated');
+// Multiple event listeners for cross-platform compatibility
+const audioInitEvents = ['touchstart', 'touchend', 'mousedown', 'keydown', 'click'];
+audioInitEvents.forEach(eventType => {
+  document.addEventListener(eventType, () => {
+    if (!audioInitialized) {
+      initAudio(3);
     }
+  }, { once: true, passive: true });
+});
 
-    function resetCanvas() {
-      ctx.clearRect(0, 0, colorCanvas.width, colorCanvas.height);
-      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-        ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+// Show enable button on mobile by default
+if (isMobileDevice()) {
+  setTimeout(showEnableSoundBtn, 1000);
+} else {
+  // Try to initialize immediately on desktop
+  setTimeout(() => initAudio(2), 500);
+}
+
+// Handle visibility changes (app backgrounded/foregrounded)
+document.addEventListener('visibilitychange', async () => {
+  if (!document.hidden && audioInitialized && Tone.context && Tone.context.state === 'suspended') {
+    try {
+      await Tone.start();
+      console.log('Audio context resumed after visibility change');
+    } catch (error) {
+      console.warn('Failed to resume audio context:', error);
+    }
+  }
+});
+
+// --- END ROBUST MOBILE AUDIO SYSTEM ---
+
+// Gujarati letters, vowels, numerals
+const gujaratiConsonants = [
+  'ક','ખ','ગ','ઘ','ઙ','ચ','છ','જ','ઝ','ઞ','ટ','ઠ',
+  'ડ','ઢ','ણ','ત','થ','દ','ધ','ન','પ','ફ','બ','ભ',
+  'મ','ય','ર','લ','વ','શ','ષ','સ','હ','ળ','ક્ષ','ત્ર'
+];
+const gujaratiVowels = ['અ','આ','ઇ','ઈ','ઉ','ઊ','એ','ઐ','ઓ','ઔ','અં','અઃ'];
+const gujaratiNumerals = ['૦','૧','૨','૩','૪','૫','૬','૭','૮','૯'];
+
+// Show Gujarati grid modal
+document.getElementById('gujaratiBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('letterGridModal').style.display = 'none';
+  createGujaratiGrid();
+  document.getElementById('gujaratiGridModal').style.display = 'flex';
+});
+document.getElementById('gujaratiBtn').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('letterGridModal').style.display = 'none';
+  createGujaratiGrid();
+  document.getElementById('gujaratiGridModal').style.display = 'flex';
+});
+
+// Show A/a grid modal
+document.getElementById('aBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+  document.getElementById('letterGridModal').style.display = 'flex';
+});
+document.getElementById('aBtn').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+  document.getElementById('letterGridModal').style.display = 'flex';
+});
+
+// Close Gujarati grid
+document.getElementById('closeGujaratiGrid').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+});
+
+// Create Gujarati grid
+function createGujaratiGrid() {
+  const gujaratiGrid = document.getElementById('gujaratiGrid');
+  const closeBtn = document.getElementById('closeGujaratiGrid');
+  gujaratiGrid.innerHTML = '';
+  gujaratiGrid.appendChild(closeBtn);
+  
+  // Consonants
+  gujaratiConsonants.forEach(char => {
+    const item = document.createElement('button');
+    item.className = 'gujarati-item';
+    item.textContent = char;
+    item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+    gujaratiGrid.appendChild(item);
+  });
+  
+  // Vowels
+  gujaratiVowels.forEach(char => {
+    const item = document.createElement('button');
+    item.className = 'gujarati-item';
+    item.textContent = char;
+    item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+    gujaratiGrid.appendChild(item);
+  });
+  
+  // Numerals
+  gujaratiNumerals.forEach(char => {
+    const item = document.createElement('button');
+    item.className = 'gujarati-item';
+    item.textContent = char;
+    item.addEventListener('click', () => showGujaratiStencilOverlay(char));
+    gujaratiGrid.appendChild(item);
+  });
+}
+
+// Show Gujarati stencil overlay
+function showGujaratiStencilOverlay(char) {
+  isStencilMode = true;
+  selectedLetter = char;
+  document.getElementById('gujaratiGridModal').style.display = 'none';
+  drawGujaratiStencilOverlay(char);
+  stencilCloseBtn.style.display = 'flex';
+  aOverlay.style.display = 'block';
+  document.getElementById('buttonContainer').style.zIndex = 40;
+  document.getElementById('mainResetBtn').style.zIndex = 40;
+  document.getElementById('cameraBtn').style.zIndex = 40;
+  document.getElementById('title').style.zIndex = 40;
+  document.getElementById('prompt').style.zIndex = 40;
+}
+
+// Draw Gujarati stencil overlay
+function drawGujaratiStencilOverlay(char) {
+  aOverlay.width = window.innerWidth;
+  aOverlay.height = window.innerHeight;
+  aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+  aCtx.globalAlpha = 1.0;
+  aCtx.fillStyle = 'black';
+  aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+  aCtx.save();
+  aCtx.globalCompositeOperation = 'destination-out';
+  let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
+  aCtx.font = `${fontSize}px 'Gopika', 'Noto Sans Gujarati', sans-serif`;
+  aCtx.textAlign = 'center';
+  aCtx.textBaseline = 'middle';
+  aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
+  aCtx.restore();
+  aCtx.globalCompositeOperation = 'source-over';
+}
+
+// --- Digital Stencil Feature ---
+let isStencilMode = false;
+const stencilCloseBtn = document.getElementById('stencilCloseBtn');
+
+// Canvas and context setup
+const colorCanvas = document.getElementById('colorCanvas');
+const aOverlay = document.getElementById('aOverlay');
+const ctx = colorCanvas.getContext('2d');
+const aCtx = aOverlay.getContext('2d');
+const backgroundImage = new Image();
+let isTouchDevice = false;
+let isAMode = false;
+let aImage = null;
+let selectedLetter = 'A';
+let selectedButton = null;
+
+// Detect touch device and initialize audio appropriately
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  isTouchDevice = true;
+  console.log('Touch device detected');
+}
+
+// Show stencil overlay with transparent letter/digit
+function showStencilOverlay(char) {
+  isStencilMode = true;
+  selectedLetter = char;
+  document.getElementById('letterGridModal').style.display = 'none';
+  drawStencilOverlay(char);
+  stencilCloseBtn.style.display = 'flex';
+  aOverlay.style.display = 'block';
+  // Keep dropdown and UI visible
+  document.getElementById('buttonContainer').style.zIndex = 40;
+  document.getElementById('mainResetBtn').style.zIndex = 40;
+  document.getElementById('cameraBtn').style.zIndex = 40;
+  document.getElementById('title').style.zIndex = 40;
+  document.getElementById('prompt').style.zIndex = 40;
+}
+
+// Draw stencil overlay: black everywhere, transparent where char is
+function drawStencilOverlay(char) {
+  aOverlay.width = window.innerWidth;
+  aOverlay.height = window.innerHeight;
+  aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+  // Fill with black
+  aCtx.globalAlpha = 1.0;
+  aCtx.fillStyle = 'black';
+  aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+  // Draw transparent letter/digit
+  aCtx.save();
+  aCtx.globalCompositeOperation = 'destination-out';
+  // Calculate font size and position
+  let fontSize = Math.min(aOverlay.width, aOverlay.height) * 0.6;
+  if (char.length > 1) fontSize *= 0.7;
+  aCtx.font = `400 normal ${fontSize}px "comic-sans-ms", sans-serif`;
+  aCtx.textAlign = 'center';
+  aCtx.textBaseline = 'middle';
+  aCtx.fillText(char, aOverlay.width/2, aOverlay.height/2);
+  aCtx.restore();
+  aCtx.globalCompositeOperation = 'source-over';
+}
+
+// Remove stencil overlay
+function exitStencilMode() {
+  isStencilMode = false;
+  aOverlay.style.display = 'none';
+  stencilCloseBtn.style.display = 'none';
+  // Restore z-indexes
+  document.getElementById('buttonContainer').style.zIndex = 15;
+  document.getElementById('mainResetBtn').style.zIndex = 10;
+  document.getElementById('cameraBtn').style.zIndex = 10;
+  document.getElementById('title').style.zIndex = 10;
+  document.getElementById('prompt').style.zIndex = 20;
+}
+
+// Stencil close button event
+stencilCloseBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  exitStencilMode();
+});
+stencilCloseBtn.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  exitStencilMode();
+});
+
+// Create letter grid
+function createLetterGrid() {
+  const letterGrid = document.getElementById('letterGrid');
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  
+  // Clear existing content except close button
+  const closeBtn = document.getElementById('closeLetterGrid');
+  letterGrid.innerHTML = '';
+  letterGrid.appendChild(closeBtn);
+  
+  // Add letters
+  for (let i = 0; i < letters.length; i++) {
+    const letter = letters[i];
+    const letterItem = document.createElement('button');
+    letterItem.className = 'letter-item';
+    letterItem.textContent = letter + letter.toLowerCase();
+    letterItem.addEventListener('click', () => showStencilOverlay(letter + letter.toLowerCase()));
+    letterGrid.appendChild(letterItem);
+  }
+  
+  // Add numbers
+  for (let i = 0; i < numbers.length; i++) {
+    const number = numbers[i];
+    const numberItem = document.createElement('button');
+    numberItem.className = 'letter-item';
+    numberItem.textContent = number;
+    numberItem.addEventListener('click', () => showStencilOverlay(number));
+    letterGrid.appendChild(numberItem);
+  }
+}
+
+// Create A image from the selected letter
+function createAImage() {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = 1000;
+    canvas.height = 1000;
+    
+    // Fill with transparent
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Create the selected letter/number
+    ctx.fillStyle = 'white';
+    ctx.font = '400 normal 600px "comic-sans-ms", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(selectedLetter, canvas.width/2, canvas.height/2);
+    
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = canvas.toDataURL();
+  });
+}
+
+// Initialize letter grid and A image
+createLetterGrid();
+createAImage().then(img => {
+  aImage = img;
+});
+
+// Create a fallback white background
+function createWhiteBackground() {
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
+}
+
+backgroundImage.src = 'white-wall.jpg';
+backgroundImage.onerror = function() {
+  createWhiteBackground();
+};
+
+backgroundImage.onload = function() {
+  ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+};
+
+function resizeCanvasDimensions() {
+  colorCanvas.width = aOverlay.width = window.innerWidth;
+  colorCanvas.height = aOverlay.height = window.innerHeight;
+  
+  if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+    ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+  } else {
+    createWhiteBackground();
+  }
+  
+  // Redraw A overlay if in A mode
+  if (isAMode && aImage) {
+    drawAOverlay();
+  }
+  
+  // Redraw stencil overlay if active
+  if (isStencilMode && selectedLetter) {
+    if (selectedLetter.match(/[\u0A80-\u0AFF]/)) {
+      drawGujaratiStencilOverlay(selectedLetter);
+    } else {
+      drawStencilOverlay(selectedLetter);
+    }
+  }
+}
+
+function drawAOverlay() {
+  aCtx.clearRect(0, 0, aOverlay.width, aOverlay.height);
+  
+  // Fill entire canvas with black
+  aCtx.fillStyle = 'black';
+  aCtx.fillRect(0, 0, aOverlay.width, aOverlay.height);
+  
+  // Calculate scaling to fit image in canvas while maintaining aspect ratio
+  const scale = Math.min(aOverlay.width / aImage.width, aOverlay.height / aImage.height) * 0.8;
+  const scaledWidth = aImage.width * scale;
+  const scaledHeight = aImage.height * scale;
+  const x = (aOverlay.width - scaledWidth) / 2;
+  const y = (aOverlay.height - scaledHeight) / 2;
+  
+  // Use destination-out to create transparent areas where the letter image is
+  aCtx.globalCompositeOperation = 'destination-out';
+  aCtx.drawImage(aImage, x, y, scaledWidth, scaledHeight);
+  aCtx.globalCompositeOperation = 'source-over';
+}
+
+function setSelectedButton(button) {
+  // Remove selection from previous button
+  if (selectedButton) {
+    selectedButton.classList.remove('selected');
+  }
+  
+  // Add selection to new button
+  if (button) {
+    button.classList.add('selected');
+    selectedButton = button;
+  }
+}
+
+function setAMode() {
+  initAudio(); // Ensure audio is ready
+  isAMode = true;
+  isGradientMode = false;
+  isEraserMode = false;
+  aOverlay.style.display = 'block';
+  document.getElementById('aCancelBtn').style.display = 'flex';
+  setSelectedButton(document.getElementById('aBtn'));
+  if (aImage) {
+    drawAOverlay();
+  }
+  console.log('A mode activated with letter:', selectedLetter);
+}
+
+function exitAMode() {
+  isAMode = false;
+  aOverlay.style.display = 'none';
+  document.getElementById('aCancelBtn').style.display = 'none';
+  if (selectedButton === document.getElementById('aBtn')) {
+    setSelectedButton(null);
+  }
+}
+
+resizeCanvasDimensions();
+window.addEventListener('resize', resizeCanvasDimensions);
+
+// Drawing variables
+let painting = false;
+let currentColor = 'rgb(255, 0, 221)';
+let isGradientMode = false;
+let isEraserMode = false;
+let gradientColors = [];
+let gradientIndex = 0;
+let colorTimer = 0;
+let colorDuration = 500;
+let lastColorChangeTime = 0;
+let currentGradientColor = null;
+let nextGradientColor = null;
+let colorTransitionProgress = 0;
+let brushSize = 30;
+let eraserAudioTimer = 0;
+let lastPlayedNote = null;
+let noteChangeThreshold = 80;
+let eraserMoving = false;
+let eraserPath = [];
+
+// Audio-related variables
+let currentNote = null;
+let noteScheduler = null;
+let playingNotes = new Set();
+
+const colorNotes = {
+  pink: "C4",
+  purple: "D4",
+  yellow: "E4",
+  orange: "F4",
+  blue: "G4"
+};
+
+const colors = [
+  { name: 'pink', rgb: 'rgb(255, 0, 221)', r: 255, g: 0, b: 221 },
+  { name: 'purple', rgb: 'rgb(92, 0, 157)', r: 92, g: 0, b: 157 },
+  { name: 'yellow', rgb: 'rgb(255, 187, 0)', r: 255, g: 187, b: 0 },
+  { name: 'orange', rgb: 'rgb(255, 77, 0)', r: 255, g: 77, b: 0 },
+  { name: 'blue', rgb: 'rgb(125, 244, 255)', r: 125, g: 244, b: 255 }
+];
+
+// Audio functions
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+async function playNote(colorName) {
+  if (!audioInitialized || !synth) {
+    console.log('Audio not ready, attempting to initialize...');
+    await initAudio();
+    if (!audioInitialized) return;
+  }
+
+  const note = colorNotes[colorName];
+  if (note) {
+    try {
+      if (isGradientMode) {
+        synth.triggerAttackRelease(note, "4n");
       } else {
-        createWhiteBackground();
+        synth.triggerAttackRelease(note, "8n");
       }
-      
-      if (isAMode) {
-        exitAMode();
-      }
+      console.log('Playing note:', note, 'for color:', colorName);
+    } catch (error) {
+      console.warn('Audio playback error:', error);
+      // Try to reinitialize audio
+      audioInitialized = false;
+      await initAudio();
     }
+  }
+}
 
-    function captureCanvas() {
+function setColor(color, button) {
+  initAudio(); // Ensure audio is ready
+  currentColor = color;
+  isGradientMode = false;
+  isEraserMode = false;
+  setSelectedButton(button);
+  console.log('Color set to:', color);
+}
+
+function setGradientMode(button) {
+  initAudio(); // Ensure audio is ready
+  isGradientMode = true;
+  isEraserMode = false;
+  setSelectedButton(button);
+  gradientColors = shuffleArray(colors);
+  gradientIndex = 0;
+  colorTimer = 0;
+  lastColorChangeTime = Date.now();
+  currentGradientColor = gradientColors[0];
+  nextGradientColor = gradientColors[1];
+  colorTransitionProgress = 0;
+  console.log('Gradient mode activated with colors:', gradientColors);
+}
+
+function setEraserMode(button) {
+  initAudio(); // Ensure audio is ready
+  isEraserMode = true;
+  isGradientMode = false;
+  setSelectedButton(button);
+  console.log('Eraser mode activated');
+}
+
+function resetCanvas() {
+  ctx.clearRect(0, 0, colorCanvas.width, colorCanvas.height);
+  if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+    ctx.drawImage(backgroundImage, 0, 0, colorCanvas.width, colorCanvas.height);
+  } else {
+    createWhiteBackground();
+  }
+  
+  if (isAMode) {
+    exitAMode();
+  }
+}
+
+// Enhanced capture function with better mobile support
+function captureCanvas() {
   const tempCanvas = document.createElement('canvas');
   const tempCtx = tempCanvas.getContext('2d');
   
@@ -1546,12 +1575,11 @@ async function initAudio() {
     String(now.getSeconds()).padStart(2, '0');
   
   // Enhanced mobile save handling
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    // Mobile devices - use different approach
+  if (isMobileDevice()) {
     tempCanvas.toBlob(function(blob) {
       const url = URL.createObjectURL(blob);
       
-      // Try Web Share API first (works on many mobile browsers)
+     // Try Web Share API first (works on many mobile browsers)
       if (navigator.share && navigator.canShare && navigator.canShare({files: [new File([blob], `drawing_${timestamp}.png`, {type: 'image/png'})]})) {
         const file = new File([blob], `drawing_${timestamp}.png`, {type: 'image/png'});
         navigator.share({
