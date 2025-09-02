@@ -644,8 +644,8 @@ canvas {
   position: fixed;
   bottom: clamp(10px, 3vh, 25px);
   right: clamp(10px, 3vw, 25px);
-  background: linear-gradient(90deg, #ff179e, #9855fe, #45a0fc);
-  color: rgb(0, 0, 0);
+  background: linear-gradient(90deg, #ff2ea8, #fd4512);
+  color: rgb(255, 255, 255);
   z-index: 10;
   padding: clamp(0.4rem, 0.6rem, 0.8rem) clamp(0.6rem, 1rem, 1.2rem);
   font-weight: bold;
@@ -657,7 +657,7 @@ canvas {
 
 #mainResetBtn:hover {
   transform: scale(1.05);
-  background: linear-gradient(90deg, #c1ff3c, #55fef8,#45a0fc);
+  background: linear-gradient(90deg,#fd4512, #ff2ea8);
   color: rgb(255, 255, 255);
 }
 
@@ -707,6 +707,7 @@ canvas {
   z-index: 2000;
   display: none;
   animation: none;
+  transition: all 0.3s ease;
 }
 
 @keyframes pulse {
@@ -818,7 +819,7 @@ canvas {
 
   <div id="prompt">Take your device off silent!</div>
 
-  <div id="title">Musings</div>
+  <div id="title">DrawNotes</div>
   
   <!-- FIXED BUTTON CONTAINER -->
   <div id="buttonContainer">
@@ -892,11 +893,12 @@ canvas {
   <button id="enableSoundBtn">Play Music!</button>
 
   <script>
-// --- ROBUST MOBILE AUDIO SYSTEM ---
+// Enhanced Music Control System
 let audioInitialized = false;
 let audioUnlocked = false;
 let pendingAudioInit = false;
 let synth = null;
+let musicPlaying = false;
 const enableSoundBtn = document.getElementById('enableSoundBtn');
 
 // Device detection
@@ -904,15 +906,28 @@ function isMobileDevice() {
   return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
 }
 
-// Show/Hide enable sound button
-function showEnableSoundBtn() {
+// Show the music button permanently on all devices
+function showMusicButton() {
   enableSoundBtn.style.display = 'block';
-  console.log('Showing enable sound button');
+  enableSoundBtn.textContent = 'Play Music!';
+  console.log('Music button shown');
 }
 
-function hideEnableSoundBtn() {
+// Hide music button (not used in new system, but kept for compatibility)
+function hideMusicButton() {
   enableSoundBtn.style.display = 'none';
-  console.log('Hiding enable sound button');
+  console.log('Music button hidden');
+}
+
+// Update button text and state
+function updateMusicButtonState() {
+  if (musicPlaying) {
+    enableSoundBtn.textContent = 'Pause Music';
+    enableSoundBtn.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
+  } else {
+    enableSoundBtn.textContent = 'Play Music!';
+    enableSoundBtn.style.background = 'linear-gradient(135deg, #ffb700, #ffb700)';
+  }
 }
 
 // Comprehensive audio context unlock
@@ -978,8 +993,7 @@ async function initAudio(retries = 5) {
   }
   
   if (!unlocked) {
-    console.log('Audio unlock failed, showing enable button');
-    showEnableSoundBtn();
+    console.log('Audio unlock failed');
     return false;
   }
   
@@ -991,58 +1005,102 @@ async function initAudio(retries = 5) {
     synth = new Tone.AMSynth().toDestination();
     
     audioInitialized = true;
-    hideEnableSoundBtn();
-    // Play test beep (C4, then E4) to confirm audio
-    try {
-      await Tone.start();
-      synth.triggerAttackRelease('C4', '8n');
-      setTimeout(() => synth.triggerAttackRelease('E4', '8n'), 350);
-    } catch (err) {
-      console.warn('Test beep failed:', err);
-    }
     console.log('Audio initialization complete');
     return true;
     
   } catch (error) {
     console.error('Synth creation failed:', error);
-    showEnableSoundBtn();
     return false;
   }
 }
 
-// Enable sound button handler
+// Toggle music on/off
+async function toggleMusic() {
+  if (!audioInitialized) {
+    console.log('Initializing audio for first time...');
+    const success = await initAudio();
+    if (!success) {
+      console.log('Failed to initialize audio');
+      return;
+    }
+  }
+  
+  if (!musicPlaying) {
+    // Start music
+    musicPlaying = true;
+    updateMusicButtonState();
+    console.log('Music enabled - drawing will now play sounds');
+  } else {
+    // Pause music
+    musicPlaying = false;
+    updateMusicButtonState();
+    console.log('Music paused - drawing is now silent');
+    
+    // Stop any currently playing notes
+    if (synth) {
+      try {
+        synth.releaseAll();
+      } catch (error) {
+        console.warn('Error stopping notes:', error);
+      }
+    }
+  }
+}
+
+// Music button event handlers
 enableSoundBtn.addEventListener('click', async (e) => {
   e.preventDefault();
   e.stopPropagation();
-  enableSoundBtn.style.display = 'none';
-  console.log('Enable sound button clicked');
-  await initAudio(5);
+  await toggleMusic();
 });
 
 enableSoundBtn.addEventListener('touchend', async (e) => {
   e.preventDefault();
   e.stopPropagation();
-  enableSoundBtn.style.display = 'none';
-  console.log('Enable sound button touched');
-  await initAudio(5);
+  await toggleMusic();
 });
 
-// Multiple event listeners for cross-platform compatibility
-const audioInitEvents = ['touchstart', 'touchend', 'mousedown', 'keydown', 'click'];
-audioInitEvents.forEach(eventType => {
-  document.addEventListener(eventType, () => {
-    if (!audioInitialized) {
-      initAudio(3);
+// Modified playNote function to respect music state
+async function playNote(colorName) {
+  // Only play if music is enabled
+  if (!musicPlaying) {
+    return;
+  }
+  
+  if (!audioInitialized || !synth) {
+    console.log('Audio not ready, attempting to initialize...');
+    await initAudio();
+    if (!audioInitialized) return;
+  }
+
+  const note = colorNotes[colorName];
+  if (note) {
+    try {
+      if (isGradientMode) {
+        synth.triggerAttackRelease(note, "4n");
+      } else {
+        synth.triggerAttackRelease(note, "8n");
+      }
+      console.log('Playing note:', note, 'for color:', colorName);
+    } catch (error) {
+      console.warn('Audio playback error:', error);
+      // Try to reinitialize audio
+      audioInitialized = false;
+      await initAudio();
     }
-  }, { once: true, passive: true });
+  }
+}
+
+// Show music button permanently on page load
+document.addEventListener('DOMContentLoaded', () => {
+  showMusicButton();
 });
 
-// Show enable button on mobile by default
-if (isMobileDevice()) {
-  setTimeout(showEnableSoundBtn, 1000);
+// Also show immediately if DOM is already loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', showMusicButton);
 } else {
-  // Try to initialize immediately on desktop
-  setTimeout(() => initAudio(2), 500);
+  showMusicButton();
 }
 
 // Handle visibility changes (app backgrounded/foregrounded)
@@ -1056,8 +1114,6 @@ document.addEventListener('visibilitychange', async () => {
     }
   }
 });
-
-// --- END ROBUST MOBILE AUDIO SYSTEM ---
 
 // Gujarati letters, vowels, numerals
 const gujaratiConsonants = [
