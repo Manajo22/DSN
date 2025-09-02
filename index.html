@@ -223,18 +223,10 @@ html, body {
   font-weight: bold;
   padding: clamp(0.5rem, 0.9rem, 1.2rem);
   z-index: 10;
-  animation: floatTitle 4s ease-in-out infinite;
-  transition: transform 0.3s ease;
+
 }
 
-@keyframes floatTitle {
-  0%, 100% {
-    transform: translateY(7px);
-  }
-  50% {
-    transform: translateY(-7px);
-  }
-}
+
 
 #prompt {
   position: fixed;
@@ -824,9 +816,9 @@ canvas {
 </head>
 <body>
 
-  <div id="prompt">Paint, Gradient, Erase, A/a Mode, Scrape.</div>
+  <div id="prompt">Take your device off silent!</div>
 
-  <div id="title">Draw, Hide, and Scratch to reveal!</div>
+  <div id="title">Musings</div>
   
   <!-- FIXED BUTTON CONTAINER -->
   <div id="buttonContainer">
@@ -897,7 +889,7 @@ canvas {
   <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
   <canvas id="aOverlay"></canvas>
   <button id="stencilCloseBtn"></button>
-  <button id="enableSoundBtn">🎵 Enable Sound</button>
+  <button id="enableSoundBtn">Play Music!</button>
 
   <script>
 // --- ROBUST MOBILE AUDIO SYSTEM ---
