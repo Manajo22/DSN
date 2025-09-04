@@ -691,7 +691,7 @@ canvas {
 /* Enable Sound Button - prominently positioned */
 #enableSoundBtn {
   position: fixed;
-  top: 16px;
+  top: 5.5rem;
   right: 12px;
   left: auto;
   transform: none;
@@ -750,6 +750,10 @@ canvas {
   #gujaratiGrid {
     grid-template-columns: repeat(8, 1fr);
   }
+  #enableSoundBtn {
+  
+  top: 4rem;
+  }
 }
 
 @media (max-width: 600px) {
@@ -790,6 +794,10 @@ canvas {
   #shapesGrid {
     grid-template-columns: repeat(2, 1fr);
   }
+  #enableSoundBtn {
+  
+  top: 4rem;
+  }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {
@@ -811,6 +819,10 @@ canvas {
   #dropdownMenu {
     max-height: 50vh;
     min-width: 50px;
+  }
+  #enableSoundBtn {
+  
+  top: 4rem;
   }
 }
   </style>
@@ -890,7 +902,7 @@ canvas {
   <!-- Stencil overlay canvas (same as aOverlay, reused for stencil mode) -->
   <canvas id="aOverlay"></canvas>
   <button id="stencilCloseBtn"></button>
-  <button id="enableSoundBtn">Play Music!</button>
+  <button id="enableSoundBtn">♫</button>
 
   <script>
 // Enhanced Music Control System
@@ -899,8 +911,14 @@ let audioUnlocked = false;
 let pendingAudioInit = false;
 let synth = null;
 let musicPlaying = false;
+let firstMusicClick = false;
 const enableSoundBtn = document.getElementById('enableSoundBtn');
-
+// Check if Tone.js loaded properly
+if (typeof Tone === 'undefined') {
+  console.error('Tone.js failed to load!');
+} else {
+  console.log('Tone.js loaded successfully, version:', Tone.version || 'unknown');
+}
 // Device detection
 function isMobileDevice() {
   return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
@@ -909,7 +927,7 @@ function isMobileDevice() {
 // Show the music button permanently on all devices
 function showMusicButton() {
   enableSoundBtn.style.display = 'block';
-  enableSoundBtn.textContent = 'Play Music!';
+  enableSoundBtn.textContent = 'Play ♫';
   console.log('Music button shown');
 }
 
@@ -921,16 +939,19 @@ function hideMusicButton() {
 
 // Update button text and state
 function updateMusicButtonState() {
+  console.log('updateMusicButtonState called, musicPlaying:', musicPlaying);
+  
   if (musicPlaying) {
     enableSoundBtn.textContent = 'Pause Music';
     enableSoundBtn.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
+    console.log('Button updated to Pause Music');
   } else {
     enableSoundBtn.textContent = 'Play Music!';
     enableSoundBtn.style.background = 'linear-gradient(135deg, #ffb700, #ffb700)';
+    console.log('Button updated to Play Music!');
   }
 }
 
-// Comprehensive audio context unlock
 async function unlockAudioContext() {
   if (audioUnlocked || pendingAudioInit) return true;
   
@@ -938,7 +959,8 @@ async function unlockAudioContext() {
   console.log('Attempting to unlock audio context...');
   
   try {
-    if (!window.Tone || !Tone.context) {
+    // Make sure Tone.js is available
+    if (!window.Tone) {
       console.log('Tone.js not available');
       return false;
     }
@@ -948,19 +970,6 @@ async function unlockAudioContext() {
       await Tone.start();
       console.log('Tone.js context started');
     }
-    
-    // Create silent buffer to fully unlock
-    const buffer = Tone.context.createBuffer(1, 1, 22050);
-    const source = Tone.context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(Tone.context.destination);
-    source.start(0);
-    
-    // Create oscillator for additional unlock
-    const osc = Tone.context.createOscillator();
-    osc.connect(Tone.context.destination);
-    osc.start(0);
-    osc.stop(0.01);
     
     audioUnlocked = true;
     console.log('Audio context unlocked successfully');
@@ -974,7 +983,6 @@ async function unlockAudioContext() {
   }
 }
 
-// Initialize audio with retry mechanism
 async function initAudio(retries = 5) {
   if (audioInitialized) {
     console.log('Audio already initialized');
@@ -983,21 +991,20 @@ async function initAudio(retries = 5) {
   
   console.log('Initializing audio...');
   
-  // First unlock the audio context
-  let unlocked = false;
-  for (let i = 0; i < retries && !unlocked; i++) {
-    unlocked = await unlockAudioContext();
-    if (!unlocked) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-  }
-  
-  if (!unlocked) {
-    console.log('Audio unlock failed');
-    return false;
-  }
-  
   try {
+    // Make sure Tone.js is available
+    if (!window.Tone) {
+      console.log('Tone.js not available');
+      return false;
+    }
+
+    // First unlock the audio context
+    const unlocked = await unlockAudioContext();
+    if (!unlocked) {
+      console.log('Audio unlock failed');
+      return false;
+    }
+    
     // Create synth after successful unlock
     if (synth) {
       synth.dispose();
@@ -1013,64 +1020,86 @@ async function initAudio(retries = 5) {
     return false;
   }
 }
-
-// Toggle music on/off
 async function toggleMusic() {
-  if (!audioInitialized) {
-    console.log('Initializing audio for first time...');
-    const success = await initAudio();
-    if (!success) {
-      console.log('Failed to initialize audio');
-      return;
-    }
-  }
+  console.log('toggleMusic called, current musicPlaying state:', musicPlaying);
   
   if (!musicPlaying) {
-    // Start music
+    console.log('Starting music...');
+    
+    // Initialize audio if not already done
+    if (!audioInitialized) {
+      console.log('Audio not initialized, initializing now...');
+      const success = await initAudio();
+      if (!success) {
+        console.log('Failed to initialize audio');
+        enableSoundBtn.textContent = 'Audio Failed';
+        enableSoundBtn.style.background = 'linear-gradient(135deg, #ff0000, #cc0000)';
+        return;
+      }
+      console.log('Audio initialized successfully');
+    }
+    
+    // Start Tone.js context
+    if (Tone.context.state === 'suspended') {
+      console.log('Starting suspended audio context');
+      await Tone.start();
+      console.log('Audio context started, state:', Tone.context.state);
+    }
+    
+    // Set music playing state
     musicPlaying = true;
     updateMusicButtonState();
     console.log('Music enabled - drawing will now play sounds');
-  } else {
-    // Pause music
-    musicPlaying = false;
-    updateMusicButtonState();
-    console.log('Music paused - drawing is now silent');
     
-    // Stop any currently playing notes
+  } else {
+    console.log('Stopping music...');
+    
+    // Stop any currently playing notes BEFORE setting musicPlaying to false
     if (synth) {
       try {
         synth.releaseAll();
+        console.log('Released all synth notes');
       } catch (error) {
         console.warn('Error stopping notes:', error);
       }
     }
+    
+    // Set music playing state to false AFTER stopping notes
+    musicPlaying = false;
+    updateMusicButtonState();
+    
+    console.log('Music stopped - drawing is now silent');
   }
+  
+  console.log('toggleMusic completed, final musicPlaying state:', musicPlaying);
 }
 
 // Music button event handlers
 enableSoundBtn.addEventListener('click', async (e) => {
+  console.log('Music button CLICK event fired');
   e.preventDefault();
   e.stopPropagation();
   await toggleMusic();
 });
 
 enableSoundBtn.addEventListener('touchend', async (e) => {
+  console.log('Music button TOUCHEND event fired');
   e.preventDefault();
   e.stopPropagation();
   await toggleMusic();
 });
 
-// Modified playNote function to respect music state
 async function playNote(colorName) {
   // Only play if music is enabled
-  if (!musicPlaying) {
+  if (!musicPlaying || !audioInitialized || !synth) {
+    console.log('playNote blocked - musicPlaying:', musicPlaying, 'audioInitialized:', audioInitialized, 'synth:', !!synth);
     return;
   }
   
-  if (!audioInitialized || !synth) {
-    console.log('Audio not ready, attempting to initialize...');
-    await initAudio();
-    if (!audioInitialized) return;
+  // Check if audio context is suspended
+  if (Tone.context.state === 'suspended') {
+    console.log('Audio context suspended, cannot play note');
+    return;
   }
 
   const note = colorNotes[colorName];
@@ -1084,28 +1113,31 @@ async function playNote(colorName) {
       console.log('Playing note:', note, 'for color:', colorName);
     } catch (error) {
       console.warn('Audio playback error:', error);
-      // Try to reinitialize audio
-      audioInitialized = false;
-      await initAudio();
     }
   }
 }
-
+// Show music button permanently on page load
 // Show music button permanently on page load
 document.addEventListener('DOMContentLoaded', () => {
   showMusicButton();
+  // Initialize button state
+  updateMusicButtonState();
 });
 
 // Also show immediately if DOM is already loaded
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', showMusicButton);
+  document.addEventListener('DOMContentLoaded', () => {
+    showMusicButton();
+    updateMusicButtonState();
+  });
 } else {
   showMusicButton();
+  updateMusicButtonState();
 }
 
 // Handle visibility changes (app backgrounded/foregrounded)
 document.addEventListener('visibilitychange', async () => {
-  if (!document.hidden && audioInitialized && Tone.context && Tone.context.state === 'suspended') {
+  if (!document.hidden && audioInitialized && Tone.context && musicPlaying && Tone.context.state === 'suspended') {
     try {
       await Tone.start();
       console.log('Audio context resumed after visibility change');
@@ -1114,6 +1146,7 @@ document.addEventListener('visibilitychange', async () => {
     }
   }
 });
+
 
 // Gujarati letters, vowels, numerals
 const gujaratiConsonants = [
@@ -1131,6 +1164,7 @@ document.getElementById('gujaratiBtn').addEventListener('click', function(e) {
   document.getElementById('letterGridModal').style.display = 'none';
   createGujaratiGrid();
   document.getElementById('gujaratiGridModal').style.display = 'flex';
+  document.getElementById('enableSoundBtn').style.zIndex = 60;
 });
 document.getElementById('gujaratiBtn').addEventListener('touchend', function(e) {
   e.preventDefault();
@@ -1152,6 +1186,7 @@ document.getElementById('aBtn').addEventListener('touchend', function(e) {
   e.stopPropagation();
   document.getElementById('gujaratiGridModal').style.display = 'none';
   document.getElementById('letterGridModal').style.display = 'flex';
+  document.getElementById('enableSoundBtn').style.zIndex = 60;
 });
 
 // Close Gujarati grid
@@ -1204,11 +1239,13 @@ function showGujaratiStencilOverlay(char) {
   drawGujaratiStencilOverlay(char);
   stencilCloseBtn.style.display = 'flex';
   aOverlay.style.display = 'block';
+  document.getElementById('enableSoundBtn').style.zIndex = 60;
   document.getElementById('buttonContainer').style.zIndex = 40;
   document.getElementById('mainResetBtn').style.zIndex = 40;
   document.getElementById('cameraBtn').style.zIndex = 40;
   document.getElementById('title').style.zIndex = 40;
   document.getElementById('prompt').style.zIndex = 40;
+  
 }
 
 // Draw Gujarati stencil overlay
@@ -1261,11 +1298,13 @@ function showStencilOverlay(char) {
   stencilCloseBtn.style.display = 'flex';
   aOverlay.style.display = 'block';
   // Keep dropdown and UI visible
+   document.getElementById('enableSoundBtn').style.zIndex = 60;
   document.getElementById('buttonContainer').style.zIndex = 40;
   document.getElementById('mainResetBtn').style.zIndex = 40;
   document.getElementById('cameraBtn').style.zIndex = 40;
   document.getElementById('title').style.zIndex = 40;
   document.getElementById('prompt').style.zIndex = 40;
+ 
 }
 
 // Draw stencil overlay: black everywhere, transparent where char is
@@ -1302,6 +1341,7 @@ function exitStencilMode() {
   document.getElementById('cameraBtn').style.zIndex = 10;
   document.getElementById('title').style.zIndex = 10;
   document.getElementById('prompt').style.zIndex = 20;
+  document.getElementById('enableSoundBtn').style.zIndex = 2000;
 }
 
 // Stencil close button event
@@ -1452,7 +1492,7 @@ function setSelectedButton(button) {
 }
 
 function setAMode() {
-  initAudio(); // Ensure audio is ready
+  
   isAMode = true;
   isGradientMode = false;
   isEraserMode = false;
@@ -1528,33 +1568,10 @@ function shuffleArray(array) {
   return shuffled;
 }
 
-async function playNote(colorName) {
-  if (!audioInitialized || !synth) {
-    console.log('Audio not ready, attempting to initialize...');
-    await initAudio();
-    if (!audioInitialized) return;
-  }
 
-  const note = colorNotes[colorName];
-  if (note) {
-    try {
-      if (isGradientMode) {
-        synth.triggerAttackRelease(note, "4n");
-      } else {
-        synth.triggerAttackRelease(note, "8n");
-      }
-      console.log('Playing note:', note, 'for color:', colorName);
-    } catch (error) {
-      console.warn('Audio playback error:', error);
-      // Try to reinitialize audio
-      audioInitialized = false;
-      await initAudio();
-    }
-  }
-}
 
 function setColor(color, button) {
-  initAudio(); // Ensure audio is ready
+  
   currentColor = color;
   isGradientMode = false;
   isEraserMode = false;
@@ -1563,7 +1580,7 @@ function setColor(color, button) {
 }
 
 function setGradientMode(button) {
-  initAudio(); // Ensure audio is ready
+  
   isGradientMode = true;
   isEraserMode = false;
   setSelectedButton(button);
@@ -1578,7 +1595,7 @@ function setGradientMode(button) {
 }
 
 function setEraserMode(button) {
-  initAudio(); // Ensure audio is ready
+  
   isEraserMode = true;
   isGradientMode = false;
   setSelectedButton(button);
@@ -1663,93 +1680,18 @@ function captureCanvas() {
       setTimeout(() => URL.revokeObjectURL(url), 100);
     }, 'image/png', 1.0);
   }
+// OLD: showImageForSave(url, timestamp);
+// NEW: Direct download fallback
+const link = document.createElement('a');
+link.href = url;
+link.download = `drawing_${timestamp}.png`;
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+setTimeout(() => URL.revokeObjectURL(url), 100);
 
-}function showImageForSave(url, timestamp) {
-  // Create overlay for image display
-  const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.9);
-    z-index: 2000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-  `;
-  
-  const img = document.createElement('img');
-  img.src = url;
-  img.style.cssText = `
-    max-width: 90%;
-    max-height: 70%;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-  `;
-  
-  const instructions = document.createElement('div');
-  instructions.style.cssText = `
-    color: white;
-    text-align: center;
-    font-size: 1.2rem;
-    margin-top: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    line-height: 1.4;
-  `;
-  
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    instructions.innerHTML = `
-      <strong>To save your drawing:</strong><br>
-      1. Press and hold the image above<br>
-      2. Tap "Save to Photos" or "Add to Photos"
-    `;
-  } else {
-    instructions.innerHTML = `
-      <strong>To save your drawing:</strong><br>
-      1. Press and hold the image above<br>
-      2. Select "Download image" or "Save image"
-    `;
-  }
-  
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕ Close';
-  closeBtn.style.cssText = `
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-  `;
-  
-  closeBtn.onclick = () => {
-    document.body.removeChild(overlay);
-    URL.revokeObjectURL(url);
-  };
-  
-  overlay.appendChild(img);
-  overlay.appendChild(instructions);
-  overlay.appendChild(closeBtn);
-  document.body.appendChild(overlay);
-  
-  // Auto-close after 30 seconds
-  setTimeout(() => {
-    if (document.body.contains(overlay)) {
-      document.body.removeChild(overlay);
-      URL.revokeObjectURL(url);
-    }
-  }, 30000);
 }
+
    document.getElementById('cameraBtn').onclick = function(e) {
   e.preventDefault();
   console.log('cameraBtn clicked');
@@ -1820,25 +1762,28 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
     }
 
     function updateGradientColor() {
-      if (!isGradientMode) return currentColor;
+  if (!isGradientMode) return currentColor;
 
-      const now = Date.now();
-      const elapsed = now - lastColorChangeTime;
-      
-      colorTransitionProgress = Math.min(elapsed / colorDuration, 1);
-      
-      if (colorTransitionProgress >= 1) {
-        gradientIndex = (gradientIndex + 1) % gradientColors.length;
-        currentGradientColor = gradientColors[gradientIndex];
-        nextGradientColor = gradientColors[(gradientIndex + 1) % gradientColors.length];
-        lastColorChangeTime = now;
-        colorTransitionProgress = 0;
-        
-        playNote(currentGradientColor.name);
-      }
-      
-      return interpolateColor(currentGradientColor, nextGradientColor, colorTransitionProgress);
+  const now = Date.now();
+  const elapsed = now - lastColorChangeTime;
+  
+  colorTransitionProgress = Math.min(elapsed / colorDuration, 1);
+  
+  if (colorTransitionProgress >= 1) {
+    gradientIndex = (gradientIndex + 1) % gradientColors.length;
+    currentGradientColor = gradientColors[gradientIndex];
+    nextGradientColor = gradientColors[(gradientIndex + 1) % gradientColors.length];
+    lastColorChangeTime = now;
+    colorTransitionProgress = 0;
+    
+    // Only play note if music is enabled
+    if (musicPlaying) {
+      playNote(currentGradientColor.name);
     }
+  }
+  
+  return interpolateColor(currentGradientColor, nextGradientColor, colorTransitionProgress);
+}
 
     function getColorNameFromRGB(rgbString) {
       const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
@@ -2055,16 +2000,20 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
         ctx.beginPath();
         ctx.moveTo(x, y);
       } else {
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = currentColor;
-        ctx.lineWidth = brushSize;
-        ctx.lineCap = "round";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        const colorName = getColorNameFromRGB(currentColor);
-        if (colorName) playNote(colorName);
-      }
+  ctx.lineTo(x, y);
+  ctx.strokeStyle = currentColor;
+  ctx.lineWidth = brushSize;
+  ctx.lineCap = "round";
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  
+  // Only play note if music is enabled
+  if (musicPlaying) {
+    const colorName = getColorNameFromRGB(currentColor);
+    if (colorName) playNote(colorName);
+  }
+}
     }
 
     function getEventCoords(e) {
@@ -2087,7 +2036,7 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
 
     function startDraw(e) {
       e.preventDefault();
-      initAudio();
+      
       painting = true;
       
       lastPlayedNote = null;
@@ -2100,20 +2049,23 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
       ctx.moveTo(coords.x, coords.y);
       
       if (isGradientMode) {
-        gradientColors = shuffleArray(colors);
-        gradientIndex = 0;
-        lastColorChangeTime = Date.now();
-        currentGradientColor = gradientColors[0];
-        nextGradientColor = gradientColors[1];
-        colorTransitionProgress = 0;
-        if (audioInitialized && synth) {
-          try {
-            synth.triggerAttackRelease(colorNotes[currentGradientColor.name], "2n");
-          } catch (error) {
-            console.log('Audio playback error:', error);
-          }
-        }
-      }
+  gradientColors = shuffleArray(colors);
+  gradientIndex = 0;
+  lastColorChangeTime = Date.now();
+  currentGradientColor = gradientColors[0];
+  nextGradientColor = gradientColors[1];
+  colorTransitionProgress = 0;
+  
+  // Only play audio if music is enabled
+  if (musicPlaying && audioInitialized && synth && Tone.context.state !== 'suspended') {
+    try {
+      synth.triggerAttackRelease(colorNotes[currentGradientColor.name], "2n");
+      console.log('Playing gradient start note for:', currentGradientColor.name);
+    } catch (error) {
+      console.log('Audio playback error:', error);
+    }
+  }
+}
       
       draw(coords.x, coords.y);
     }
@@ -2264,9 +2216,7 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
       colorCanvas.addEventListener('mousemove', moveDraw);
     }
 
-    // Ensure audio context is started on any user interaction
-    document.addEventListener('touchstart', initAudio, { once: true });
-    document.addEventListener('click', initAudio, { once: true });
+    
 
     // Continuous audio maintenance for eraser
     setInterval(maintainEraserAudio, 50);
@@ -2274,18 +2224,9 @@ document.getElementById('cameraBtn').addEventListener('touchend', function(e) {
     // Set initial color selection
     setColor('rgb(255, 0, 221)', document.querySelector('.dropdown-item.pink'));
 // Initialize audio on page load for better mobile support
+// Show music button on page load
 window.addEventListener('DOMContentLoaded', () => {
-  // Show enable sound button initially on mobile
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    setTimeout(showEnableSoundButton, 1000);
-  }
-});
-
-// Add visibility change listener to reinitialize audio when page becomes visible
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && audioInitialized && synth && Tone.context.state === 'suspended') {
-    Tone.start().catch(console.error);
-  }
+  showMusicButton();
 });
     const shapesList = [
       {name:'Horizontal Line',svg:'<svg width="40" height="40"><line x1="5" y1="20" x2="35" y2="20" stroke="#222" stroke-width="4"/></svg>'},
@@ -2308,6 +2249,7 @@ document.addEventListener('visibilitychange', () => {
     ];
 
     function createShapesGrid() {
+       document.getElementById('enableSoundBtn').style.zIndex = 60;
       const shapesGrid = document.getElementById('shapesGrid');
       const closeBtn = document.getElementById('closeShapesGrid');
       shapesGrid.innerHTML = '';
@@ -2323,6 +2265,7 @@ document.addEventListener('visibilitychange', () => {
     }
 
     // Show shapes grid modal
+    
     const shapesBtn = document.getElementById('shapesBtn');
     shapesBtn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2349,6 +2292,7 @@ document.addEventListener('visibilitychange', () => {
     });
 
     function showShapeStencilOverlay(shapeName) {
+      
       // Hide the shapes grid modal
       document.getElementById('shapesGridModal').style.display = 'none';
       // Get the overlay canvas
@@ -2372,6 +2316,7 @@ document.addEventListener('visibilitychange', () => {
       document.getElementById('stencilCloseBtn').style.display = 'flex';
       // Set stencil mode
       isStencilMode = true;
+      document.getElementById('enableSoundBtn').style.zIndex = 60;
     }
 
     function drawShapeStencil(ctx, shapeName) {
