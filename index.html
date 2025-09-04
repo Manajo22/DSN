@@ -239,10 +239,13 @@ html, body {
   font-size: clamp(0.8rem, 1vw, 1.2rem);
   font-weight: bold;
   z-index: 20;
-  animation: fadeOut 2s 2s forwards;
   text-align: center;
   max-width: 90vw;
   box-sizing: border-box;
+}
+
+#prompt.show {
+  animation: fadeOut 2s 2s forwards;
 }
 
 @keyframes fadeOut {
@@ -829,8 +832,7 @@ canvas {
 </head>
 <body>
 
-  <div id="prompt">Take your device off silent!</div>
-
+  <div id="prompt" style="display: none;">Take your device off silent!</div>
   <div id="title">DrawNotes</div>
   
   <!-- FIXED BUTTON CONTAINER -->
@@ -911,7 +913,7 @@ let audioUnlocked = false;
 let pendingAudioInit = false;
 let synth = null;
 let musicPlaying = false;
-let firstMusicClick = false;
+let firstMusicClick = true;
 const enableSoundBtn = document.getElementById('enableSoundBtn');
 // Check if Tone.js loaded properly
 if (typeof Tone === 'undefined') {
@@ -942,11 +944,11 @@ function updateMusicButtonState() {
   console.log('updateMusicButtonState called, musicPlaying:', musicPlaying);
   
   if (musicPlaying) {
-    enableSoundBtn.textContent = 'Pause Music';
+    enableSoundBtn.textContent = 'Pause ♫';
     enableSoundBtn.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
     console.log('Button updated to Pause Music');
   } else {
-    enableSoundBtn.textContent = 'Play Music!';
+    enableSoundBtn.textContent = 'Play ♫';
     enableSoundBtn.style.background = 'linear-gradient(135deg, #ffb700, #ffb700)';
     console.log('Button updated to Play Music!');
   }
@@ -1023,6 +1025,14 @@ async function initAudio(retries = 5) {
 async function toggleMusic() {
   console.log('toggleMusic called, current musicPlaying state:', musicPlaying);
   
+  // Show prompt on first click only
+  if (firstMusicClick) {
+    const promptElement = document.getElementById('prompt');
+    promptElement.style.display = 'block';
+    promptElement.classList.add('show');
+    firstMusicClick = false;
+  }
+  
   if (!musicPlaying) {
     console.log('Starting music...');
     
@@ -1073,7 +1083,6 @@ async function toggleMusic() {
   
   console.log('toggleMusic completed, final musicPlaying state:', musicPlaying);
 }
-
 // Music button event handlers
 enableSoundBtn.addEventListener('click', async (e) => {
   console.log('Music button CLICK event fired');
